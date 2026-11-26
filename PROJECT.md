@@ -7,7 +7,8 @@ como pendente em vez de descrito como pronto.
 
 - Android nativo em Kotlin 2.0.21, AGP 8.7.3, Gradle 8.11.1
 - `compileSdk`/`targetSdk` 36, `minSdk` 29
-- Material 3 + AppCompat (sem Google Play Services)
+- Material 3 + AppCompat (sem conta Google)
+- ML Kit Text Recognition embutido (OCR offline)
 - MapLibre Native 12.3.1 (mapa offline)
 - WorkManager, AndroidX Biometric, kotlinx-coroutines
 - SQLite local (`DatabaseHelper`)
@@ -25,22 +26,24 @@ como pendente em vez de descrito como pronto.
 | `DatabaseHelper.kt` | histórico de corridas, despesas e abastecimentos |
 | `OfflineMapPackManager.kt` | download e verificação dos pacotes de mapa |
 | `map/` | motor de rota, catálogo de regiões, estilos e navegação |
-| `LeitorDeTela.kt` | ponto único de leitura de imagem (hoje sem motor) |
+| `LeitorDeTela.kt` | ponto único de leitura de imagem (ML Kit Text Recognition) |
 
 ## Decisões desta fase
 
-1. **Sem Firebase e sem Play Services**: nada de login, Firestore, Billing ou ML Kit.
+1. **Sem Firebase e sem conta Google**: nada de login, Firestore ou Billing. A única peça
+   do Google é o ML Kit Text Recognition embutido, usado só para o OCR local.
 2. **Sem login**: o app abre direto; não há conta, plano ou sincronização.
 3. **Sem banco remoto**: preferências e histórico ficam só no aparelho.
 4. **Mapa colaborativo desligado**: `SinalIndisponivelRepository` devolve lista vazia e avisa
    que o recurso chega na próxima fase — nenhum pino fictício.
-5. **OCR desligado**: `LeitorDeTela.ler()` devolve `null` até a escolha de um novo motor.
-   A leitura pela árvore de acessibilidade continua funcionando.
+5. **OCR ativo**: `LeitorDeTela.ler()` usa ML Kit Text Recognition (modelo embutido no APK,
+   sem internet) e devolve as linhas com a posição na captura. A árvore de acessibilidade
+   continua sendo a primeira fonte.
 6. **Premium**: `Premium.ativo()` devolve `true` (tudo liberado) enquanto não há cobrança.
 
 ## Pendências conhecidas
 
-- Escolher e integrar um motor de OCR (o anterior foi removido junto com o Google ML Kit).
-- Publicar os pacotes de mapa offline no repositório novo (`map-packs-v1`).
+- Servidor dos pinos do mapa colaborativo (a camada já existe, falta a API).
+- Regerar/ampliar os pacotes offline além de Joinville (SC) e Pará (PA).
 - Política de privacidade e página de exclusão de dados para a Play.
 - Revisar os textos de Apoiar/PIX antes de publicar.

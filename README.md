@@ -12,9 +12,10 @@ controla despesas do dia e trabalha com mapa offline (MapLibre).
 | Login / conta | não existe nesta fase |
 | Firebase / Firestore / Billing | removidos |
 | Banco | SQLite local (`DatabaseHelper`), nenhum banco remoto |
-| Mapa colaborativo | sem servidor: a tela avisa que está offline e não desenha pinos |
-| OCR de imagem | desligado (motor anterior removido); ver `LeitorDeTela` |
-| Baixa de mapas offline | aponta para este repositório; os pacotes ainda não foram publicados |
+| Mapa | online pelo OpenFreeMap quando não há pacote; offline (PMTiles) quando o pacote está instalado |
+| Mapa colaborativo | a camada de pinos existe, mas ainda não tem servidor: fica vazia |
+| OCR de imagem | ativo com ML Kit Text Recognition embutido (funciona sem internet) |
+| Baixa de mapas offline | publicada na release [`map-packs-v1`](https://github.com/andrefonn/drifly-condutor/releases/tag/map-packs-v1) deste repositório |
 
 ## Requisitos
 
@@ -30,6 +31,22 @@ gradlew.bat :app:testDebugUnitTest
 ```
 
 O APK sai em `app/build/outputs/apk/debug/`.
+
+## Mapa e pacotes offline
+
+O mapa é híbrido: dentro de um pacote instalado ele desenha o vetor local (PMTiles via
+`LocalMapTileServer`); fora dele usa o OpenFreeMap online, sem chave. O aviso de download só
+aparece quando a região tem pacote publicado.
+
+Os arquivos ficam na release `map-packs-v1` deste repositório:
+
+| Pacote | Tamanho | Área |
+| --- | --- | --- |
+| `joinville-pack-v1.zip` | 28 MB | Joinville e região (SC) |
+| `pa-pack-v1.zip` | 113 MB | Pará |
+
+`catalog.json` (catálogo das regiões) e `manifest.json` (formato antigo) também estão na release.
+Para publicar um pacote novo, use `scripts/map-pack/` e envie os arquivos para a mesma release.
 
 ## Assinar para release
 
