@@ -1,0 +1,45 @@
+<resources>
+    <style name="Theme.DriFly" parent="Theme.Material3.Light.NoActionBar">
+        <!-- Tipografia Premium Plus Jakarta Sans -->
+        <item name="android:fontFamily">@font/plus_jakarta_sans</item>
+        <item name="fontFamily">@font/plus_jakarta_sans</item>
+
+        <!-- Cores Primárias do Branding -->
+        <item name="colorPrimary">@color/drifly_orange</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="colorSecondary">@color/drifly_orange_2</item>
+        <item name="colorOnSecondary">#FFFFFF</item>
+
+        <item name="colorSurface">@color/drifly_card</item>
+        <item name="colorOnSurface">@color/drifly_ink</item>
+        <item name="colorSurfaceVariant">@color/drifly_field</item>
+        <item name="colorOnSurfaceVariant">@color/drifly_mut</item>
+        <item name="colorOutline">@color/drifly_line</item>
+
+        <item name="android:statusBarColor">@color/drifly_bg</item>
+        <item name="android:navigationBarColor">@color/drifly_card</item>
+        <item name="android:windowBackground">@color/drifly_bg</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:windowLightNavigationBar">true</item>
+
+        <!-- Custom Indicator for BottomNavigationView -->
+        <item name="bottomNavigationStyle">@style/Widget.DriFly.BottomNavigationView</item>
+    </style>
+
+    <style name="Widget.DriFly.BottomNavigationView" parent="Widget.Material3.BottomNavigationView">
+        <item name="itemActiveIndicatorStyle">@style/Widget.DriFly.BottomNavIndicator</item>
+        <item name="itemRippleColor">#1FFF6F00</item>
+        <item name="backgroundTint">@color/drifly_card</item>
+    </style>
+
+    <style name="Widget.DriFly.BottomNavIndicator" parent="Widget.Material3.BottomNavigationView.ActiveIndicator">
+        <item name="android:color">#00000000</item>
+        <item name="android:width">72dp</item>
+        <item name="android:height">44dp</item>
+        <item name="shapeAppearance">@style/ShapeAppearance.DriFly.Pill</item>
+    </style>
+
+    <style name="ShapeAppearance.DriFly.Pill" parent="ShapeAppearance.Material3.SmallComponent">
+        <item name="cornerSize">24dp</item>
+    </style>
+</resources>

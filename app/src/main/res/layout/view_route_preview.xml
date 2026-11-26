@@ -1,0 +1,274 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Prévia de rota offline (estilo Uber/99):
+    Mostra tempo, km, custo estimado de combustível (DriFly), badge de otimização
+    multi-paradas, badge de bairros da Lista Negra evitados, rotas alternativas,
+    botão "Iniciar" (GPS) e botão "Simular" (demo estacionária em Joinville).
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/routePreviewCard"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_map_card"
+    android:clickable="true"
+    android:elevation="12dp"
+    android:focusable="true"
+    android:orientation="vertical"
+    android:padding="14dp"
+    android:visibility="gone">
+
+    <!-- Linha superior: ETA + distância + custo combustível + fechar -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="bottom"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/tvPreviewDuration"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/plus_jakarta_sans"
+                    android:text="14 min"
+                    android:textColor="@color/drifly_ink"
+                    android:textSize="22sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvPreviewDistance"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:text="6,4 km"
+                    android:textColor="@color/drifly_mut"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvPreviewFuelCost"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:background="@drawable/bg_light_pill_green"
+                    android:paddingHorizontal="8dp"
+                    android:paddingVertical="2dp"
+                    android:text="R$ 1,35"
+                    android:textColor="@color/drifly_green"
+                    android:textSize="11.5sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/tvPreviewDestination"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:singleLine="true"
+                android:text="Destino selecionado"
+                android:textColor="@color/drifly_mut"
+                android:textSize="12.5sp" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/btnPreviewClose"
+            android:layout_width="34dp"
+            android:layout_height="34dp"
+            android:background="@drawable/bg_light_circle"
+            android:clickable="true"
+            android:contentDescription="Fechar prévia de rota"
+            android:focusable="true"
+            android:gravity="center"
+            android:text="×"
+            android:textColor="@color/drifly_mut"
+            android:textSize="20sp" />
+    </LinearLayout>
+
+    <!-- Chips de status: rota otimizada, Lista Negra evitada, avisos -->
+    <HorizontalScrollView
+        android:id="@+id/previewBadgesScroll"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:overScrollMode="never"
+        android:scrollbars="none">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/chipPreviewBlacklistToggle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_light_pill_green"
+                android:clickable="true"
+                android:focusable="true"
+                android:maxLines="1"
+                android:paddingHorizontal="10dp"
+                android:paddingVertical="5dp"
+                android:singleLine="true"
+                android:text="Evitando Lista Negra"
+                android:textColor="@color/drifly_green"
+                android:textSize="11.5sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/chipPreviewProfile"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="6dp"
+                android:background="@drawable/bg_map_chip"
+                android:clickable="true"
+                android:focusable="true"
+                android:maxLines="1"
+                android:paddingHorizontal="10dp"
+                android:paddingVertical="5dp"
+                android:singleLine="true"
+                android:text="Mais rápida"
+                android:textColor="@color/drifly_ink"
+                android:textSize="11.5sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/chipPreviewOptimized"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="6dp"
+                android:background="@drawable/bg_light_pill_orange"
+                android:maxLines="1"
+                android:paddingHorizontal="10dp"
+                android:paddingVertical="5dp"
+                android:singleLine="true"
+                android:text="Rota otimizada"
+                android:textColor="@color/drifly_orange_deep"
+                android:textSize="11.5sp"
+                android:textStyle="bold"
+                android:visibility="gone" />
+        </LinearLayout>
+    </HorizontalScrollView>
+
+    <!-- Aviso (ex.: parada dentro de área da Lista Negra) -->
+    <TextView
+        android:id="@+id/tvPreviewWarning"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:background="@drawable/bg_light_amber"
+        android:paddingHorizontal="10dp"
+        android:paddingVertical="6dp"
+        android:textColor="@color/drifly_amber"
+        android:textSize="11.5sp"
+        android:textStyle="bold"
+        android:visibility="gone" />
+
+    <!-- Rotas alternativas (clicáveis para trocar a rota ativa, rolagem horizontal) -->
+    <HorizontalScrollView
+        android:id="@+id/previewAlternativesScroll"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:overScrollMode="never"
+        android:scrollbars="none"
+        android:visibility="gone">
+
+        <LinearLayout
+            android:id="@+id/previewAlternativesRow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal" />
+    </HorizontalScrollView>
+
+    <!-- Paradas (quando multi-paradas) -->
+    <HorizontalScrollView
+        android:id="@+id/previewStopsScroll"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:overScrollMode="never"
+        android:scrollbars="none"
+        android:visibility="gone">
+
+        <LinearLayout
+            android:id="@+id/previewStopsContainer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal" />
+    </HorizontalScrollView>
+
+    <!-- Ações principais: + Parada, Simular (demo Joinville) e Iniciar -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/btnPreviewAddStop"
+            android:layout_width="wrap_content"
+            android:layout_height="44dp"
+            android:background="@drawable/bg_light_btn_secondary"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center"
+            android:maxLines="1"
+            android:paddingHorizontal="12dp"
+            android:singleLine="true"
+            android:text="+ Parada"
+            android:textColor="@color/drifly_ink"
+            android:textSize="12.5sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/btnPreviewSimulate"
+            android:layout_width="wrap_content"
+            android:layout_height="44dp"
+            android:layout_marginStart="8dp"
+            android:background="@drawable/bg_light_btn_secondary"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center"
+            android:maxLines="1"
+            android:paddingHorizontal="12dp"
+            android:singleLine="true"
+            android:text="Simular"
+            android:textColor="@color/drifly_blue"
+            android:textSize="12.5sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/btnPreviewStartNav"
+            android:layout_width="0dp"
+            android:layout_height="44dp"
+            android:layout_marginStart="8dp"
+            android:layout_weight="1"
+            android:background="@drawable/bg_btn_primary_gradient"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center"
+            android:maxLines="1"
+            android:singleLine="true"
+            android:text="Iniciar"
+            android:textColor="#FFFFFF"
+            android:textSize="14.5sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+</LinearLayout>

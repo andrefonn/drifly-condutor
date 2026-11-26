@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Balão da dica ao lado da bolinha flutuante (Fase 5).
+
+  É uma janela própria (TYPE_APPLICATION_OVERLAY) separada da bolinha e do
+  velocímetro, como no FuelBubbleService: assim o balão pode aparecer/sumir sem
+  mexer na posição da bolinha.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/balloonRoot"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:minWidth="150dp"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:paddingStart="8dp"
+    android:paddingEnd="11dp"
+    android:paddingVertical="8dp"
+    android:background="@drawable/bg_overlay_dica"
+    android:elevation="12dp">
+
+    <!-- Círculo do tipo (cor entra por backgroundTint) -->
+    <FrameLayout
+        android:id="@+id/balloonIconBox"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:background="@drawable/bg_overlay_dica_icon">
+
+        <ImageView
+            android:id="@+id/balloonIcon"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_gravity="center"
+            android:contentDescription="@null"
+            android:src="@drawable/ic_signal_dica"
+            app:tint="@android:color/white" />
+    </FrameLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/balloonTitle"
+            android:layout_width="wrap_content"
+            android:maxWidth="200dp"
+            android:layout_height="wrap_content"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:fontFamily="sans-serif-medium"
+            android:text="Dica de motorista"
+            android:textColor="@color/drifly_ink"
+            android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/balloonText"
+            android:layout_width="wrap_content"
+            android:maxWidth="200dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="1dp"
+            android:maxLines="2"
+            android:ellipsize="end"
+            android:fontFamily="sans-serif"
+            android:textColor="@color/drifly_mut"
+            android:textSize="12sp" />
+    </LinearLayout>
+</LinearLayout>

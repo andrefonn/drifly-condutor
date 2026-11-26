@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Segurança de rede do DriFly:
+    - Todo tráfego externo permanece estritamente HTTPS (cleartextTrafficPermitted="false").
+    - HTTP local é liberado exclusivamente para 127.0.0.1 / localhost, usado pelo
+      LocalMapTileServer embutido para servir PMTiles, estilo e glifos 100% offline.
+-->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="false" />
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="false">127.0.0.1</domain>
+        <domain includeSubdomains="false">localhost</domain>
+    </domain-config>
+</network-security-config>

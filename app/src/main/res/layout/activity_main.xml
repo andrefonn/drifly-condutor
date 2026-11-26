@@ -1,0 +1,3278 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_light_screen">
+
+    <!-- Topo Fixo com Branding Moderno e Engrenagem -->
+    <LinearLayout
+        android:id="@+id/headerBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="20dp"
+        android:paddingTop="14dp"
+        android:paddingBottom="12dp">
+
+        <FrameLayout
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:background="@drawable/bg_light_logo"
+            android:padding="6dp">
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:src="@drawable/ic_drifly_mark"
+                android:contentDescription="DriFly Logo" />
+        </FrameLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="14dp"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Dri"
+                    android:textColor="@color/drifly_ink"
+                    android:fontFamily="@font/plus_jakarta_sans"
+                    android:textStyle="bold"
+                    android:textSize="25sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Fly"
+                    android:textColor="@color/drifly_orange"
+                    android:fontFamily="@font/plus_jakarta_sans"
+                    android:textStyle="bold"
+                    android:textSize="25sp" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/tvSubtitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Painel de Resultados"
+                android:textColor="@color/drifly_mut"
+                android:fontFamily="@font/plus_jakarta_sans"
+                android:textSize="12sp" />
+        </LinearLayout>
+
+        <!-- Botão Modo Casa -->
+        <ImageButton
+            android:id="@+id/btnToggleHomeMode"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginEnd="10dp"
+            android:background="@drawable/bg_light_circle"
+            android:padding="9dp"
+            android:scaleType="fitCenter"
+            app:tint="@color/drifly_icon"
+            android:src="@drawable/ic_home_mode"
+            android:contentDescription="Modo Casa" />
+
+        <!-- Botão Engrenagem -->
+        <ImageButton
+            android:id="@+id/btnOpenSettings"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="@drawable/bg_light_circle"
+            android:padding="9dp"
+            android:scaleType="fitCenter"
+            app:tint="@color/drifly_icon"
+            android:src="@drawable/ic_settings_gear"
+            android:contentDescription="Permissões do Sistema" />
+    </LinearLayout>
+
+    <!-- Banner Flutuante de Alertas e Notificações (Animação Suave Slide Down/Up) -->
+    <LinearLayout
+        android:id="@+id/layoutNotificationBanner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_marginHorizontal="18dp"
+        android:layout_marginTop="10dp"
+        android:elevation="30dp"
+        android:visibility="gone"
+        android:background="@drawable/bg_banner_dark"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="14dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:id="@+id/ivBannerIcon"
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:src="@drawable/ic_banner_check"
+            android:contentDescription="Status Icon" />
+
+        <TextView
+            android:id="@+id/tvBannerMessage"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="12dp"
+            android:textColor="#FFFFFF"
+            android:fontFamily="@font/plus_jakarta_sans"
+            android:textStyle="bold"
+            android:textSize="13sp"
+            android:text="Notificação" />
+    </LinearLayout>
+
+    <!-- Área de Conteúdo Central -->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/headerBar"
+        android:layout_above="@id/bottomNavDivider">
+
+        <!-- ABA 1: RESULTADOS & FINANÇAS -->
+        <ScrollView
+            android:id="@+id/viewTabFinance"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fillViewport="true"
+            android:overScrollMode="never"
+            android:visibility="visible">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingHorizontal="16dp"
+                android:paddingTop="2dp"
+                android:paddingBottom="20dp">
+
+                <!-- 1. Progresso da meta -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_light_card"
+                    android:padding="16dp"
+                    android:orientation="vertical">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <ImageView
+                            android:layout_width="18dp"
+                            android:layout_height="18dp"
+                            android:src="@drawable/ic_target_orange"
+                            android:contentDescription="Progresso da meta" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:text="Progresso da sua meta"
+                            android:textColor="@color/drifly_ink"
+                            android:fontFamily="@font/plus_jakarta_sans"
+                            android:textStyle="bold"
+                            android:textSize="14sp" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:singleLine="true"
+                            android:text="Meta:"
+                            android:textColor="@color/drifly_ink"
+                            android:fontFamily="@font/plus_jakarta_sans"
+                            android:textStyle="bold"
+                            android:textSize="15sp" />
+
+                        <TextView
+                            android:id="@+id/tvGoalTarget"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="5dp"
+                            android:singleLine="true"
+                            android:text="R$ 0,00"
+                            android:textColor="@color/drifly_orange"
+                            android:fontFamily="@font/plus_jakarta_sans"
+                            android:textStyle="bold"
+                            android:textSize="15sp" />
+
+                        <TextView
+                            android:id="@+id/tvGoalAchieved"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:gravity="end"
+                            android:singleLine="true"
+                            android:text="Atingido: R$ 0,00"
+                            android:textColor="@color/drifly_mut"
+                            android:fontFamily="@font/plus_jakarta_sans"
+                            android:textSize="12sp" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <ProgressBar
+                            android:id="@+id/pbGoal"
+                            style="?android:attr/progressBarStyleHorizontal"
+                            android:layout_width="0dp"
+                            android:layout_height="8dp"
+                            android:layout_weight="1"
+                            android:minHeight="8dp"
+                            android:maxHeight="8dp"
+                            android:progress="0"
+                            android:progressDrawable="@drawable/progress_bar_light" />
+
+                        <TextView
+                            android:id="@+id/tvGoalPercent"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="10dp"
+                            android:singleLine="true"
+                            android:text="0%"
+                            android:textColor="@color/drifly_orange"
+                            android:fontFamily="@font/plus_jakarta_sans"
+                            android:textStyle="bold"
+                            android:textSize="12sp" />
+                    </LinearLayout>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginTop="14dp"
+                        android:background="@color/drifly_line" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="14dp"
+                        android:orientation="horizontal"
+                        android:baselineAligned="false">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:gravity="center_horizontal"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:singleLine="true"
+                                android:text="Faturamento"
+                                android:textColor="@color/drifly_mut"
+                                android:fontFamily="@font/plus_jakarta_sans"
+                                android:textStyle="bold"
+                                android:textSize="11sp" />
+
+                            <TextView
+                                android:id="@+id/tvGrossToday"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
+                                android:singleLine="true"
+                                android:text="R$ 0,00"
+                                android:textColor="@color/drifly_ink"
+                                android:fontFamily="@font/plus_jakarta_sans"
+                                android:textStyle="bold"
+                                android:textSize="15sp" />
+                        </LinearLayout>
+
+                        <View
+                            android:layout_width="1dp"
+                            android:layout_height="34dp"
+                            android:background="@color/drifly_line" />
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:gravity="center_horizontal"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:singleLine="true"
+                                android:text="Despesas"
+                                android:textColor="@color/drifly_mut"
+                                android:fontFamily="@font/plus_jakarta_sans"
+                                android:textStyle="bold"
+                                android:textSize="11sp" />
+
+                            <TextView
+                                android:id="@+id/tvExpensesToday"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
+                                android:singleLine="true"
+                                android:text="R$ 0,00"
+                                android:textColor="@color/drifly_red"
+                                android:fontFamily="@font/plus_jakarta_sans"
+                                android:textStyle="bold"
+                                android:textSize="15sp" />
+                        </LinearLayout>
+
+                        <View
+                            android:layout_width="1dp"
+                            android:layout_height="34dp"
+                            android:background="@color/drifly_line" />
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:gravity="center_horizontal"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:singleLine="true"
+                                android:text="Lucro líquido"
+                                android:textColor="@color/drifly_mut"
+                                android:fontFamily="@font/plus_jakarta_sans"
+                                android:textStyle="bold"
+                                android:textSize="11sp" />
+
+                            <TextView
+                                android:id="@+id/tvNetToday"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
+                                android:singleLine="true"
+                                android:text="R$ 0,00"
+                                android:textColor="@color/drifly_green"
+                                android:fontFamily="@font/plus_jakarta_sans"
+                                android:textStyle="bold"
+                                android:textSize="15sp" />
+                        </LinearLayout>
+                    </LinearLayout>
+                </LinearLayout>
+
+                <!-- 2. Lançar despesa -->
+                <RelativeLayout
+                    android:id="@+id/btnAddExpense"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:layout_marginTop="12dp"
+                    android:background="@drawable/bg_light_btn_primary"
+                    android:elevation="4dp"
+                    android:paddingHorizontal="16dp"
+                    android:clickable="true"
+                    android:focusable="true">
+
+                    <ImageView
+                        android:id="@+id/ivPlusIcon"
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        android:layout_alignParentStart="true"
+                        android:layout_centerVertical="true"
+                        android:src="@drawable/ic_plus_white"
+                        android:contentDescription="Lançar despesa" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_toEndOf="@id/ivPlusIcon"
+                        android:layout_centerVertical="true"
+                        android:layout_marginStart="10dp"
+                        android:singleLine="true"
+                        android:text="Lançar despesa"
+                        android:textColor="#FFFFFF"
+                        android:fontFamily="@font/plus_jakarta_sans"
+                        android:textStyle="bold"
+                        android:textSize="14.5sp" />
+
+                    <ImageView
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
+                        android:src="@drawable/ic_chevron_right"
+                        android:contentDescription="Avançar" />
+                </RelativeLayout>
+
+                <!-- 3. Histórico de corridas -->
+                <RelativeLayout
+                    android:id="@+id/btnOpenFullHistory"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:layout_marginTop="10dp"
+                    android:background="@drawable/bg_light_btn_secondary"
+                    android:paddingHorizontal="16dp"
+                    android:clickable="true"
+                    android:focusable="true">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentStart="true"
+                        android:layout_centerVertical="true"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <ImageView
+                            android:layout_width="18dp"
+                            android:layout_height="18dp"
+                            android:src="@drawable/ic_calendar_orange"
+                            android:contentDescription="Histórico" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="10dp"
+                            android:singleLine="true"
+                            android:text="Histórico de corridas"
+                            android:textColor="@color/drifly_ink"
+                            android:fontFamily="@font/plus_jakarta_sans"
+                            android:textStyle="bold"
+                            android:textSize="14sp" />
+                    </LinearLayout>
+
+                    <ImageView
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
+                        android:src="@drawable/ic_chevron_right"
+                        app:tint="@color/drifly_icon"
+                        android:contentDescription="Abrir histórico" />
+                </RelativeLayout>
+
+                <!-- 4. Ajustar meta de ganhos -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:background="@drawable/bg_light_card"
+                    android:padding="16dp"
+                    android:orientation="vertical">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <ImageView
+                            android:layout_width="18dp"
+                            android:layout_height="18dp"
+                            android:src="@drawable/ic_trending_chart"
+                            android:contentDescription="Ajustar meta" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:text="Ajustar meta de ganhos"
+                            android:textColor="@color/drifly_ink"
+                            android:fontFamily="@font/plus_jakarta_sans"
+                            android:textStyle="bold"
+                            android:textSize="14sp" />
+                    </LinearLayout>
+
+                    <RadioGroup
+                        android:id="@+id/rgGoalType"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:orientation="horizontal">
+
+                        <RadioButton
+                            android:id="@+id/rbDaily"
+                            android:layout_width="0dp"
+                            android:layout_height="38dp"
+                            android:layout_weight="1"
+                            android:button="@null"
+                            android:background="@drawable/bg_segment_choice"
+                            android:gravity="center"
+                            android:singleLine="true"
+                            android:text="Diária"
+                            android:textColor="@color/segment_text"
+                            android:fontFamily="@font/plus_jakarta_sans"
+                            android:textStyle="bold"
+                            android:textSize="13sp" />
+
+                        <RadioButton
+                            android:id="@+id/rbWeekly"
+                            android:layout_width="0dp"
+                            android:layout_height="38dp"
+                            android:layout_weight="1"
+                            android:layout_marginStart="8dp"
+                            android:button="@null"
+                            android:background="@drawable/bg_segment_choice"
+                            android:gravity="center"
+                            android:singleLine="true"
+                            android:text="Semanal"
+                            android:textColor="@color/segment_text"
+                            android:fontFamily="@font/plus_jakarta_sans"
+                            android:textStyle="bold"
+                            android:textSize="13sp" />
+
+                        <RadioButton
+                            android:id="@+id/rbMonthly"
+                            android:layout_width="0dp"
+                            android:layout_height="38dp"
+                            android:layout_weight="1"
+                            android:layout_marginStart="8dp"
+                            android:button="@null"
+                            android:background="@drawable/bg_segment_choice"
+                            android:gravity="center"
+                            android:singleLine="true"
+                            android:text="Mensal"
+                            android:textColor="@color/segment_text"
+                            android:fontFamily="@font/plus_jakarta_sans"
+                            android:textStyle="bold"
+                            android:textSize="13sp" />
+                    </RadioGroup>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:layout_marginBottom="6dp"
+                        android:text="Valor alvo"
+                        android:textColor="@color/drifly_mut"
+                        android:fontFamily="@font/plus_jakarta_sans"
+                        android:textStyle="bold"
+                        android:textSize="12.5sp" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="46dp"
+                        android:background="@drawable/bg_light_field"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:paddingHorizontal="14dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="R$"
+                            android:textColor="@color/drifly_mut"
+                            android:fontFamily="@font/plus_jakarta_sans"
+                            android:textStyle="bold"
+                            android:textSize="13.5sp" />
+
+                        <EditText
+                            android:id="@+id/etGoalTarget"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_marginStart="8dp"
+                            android:background="@null"
+                            android:hint="150,00"
+                            android:textColor="@color/drifly_ink"
+                            android:textColorHint="#93A0B4"
+                            android:fontFamily="@font/plus_jakarta_sans"
+                            android:textStyle="bold"
+                            android:textSize="16sp"
+                            android:inputType="numberDecimal"
+                            android:digits="0123456789,." />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/btnSaveGoalOnly"
+                        android:layout_width="match_parent"
+                        android:layout_height="46dp"
+                        android:layout_marginTop="12dp"
+                        android:background="@drawable/bg_light_btn_primary"
+                        android:elevation="4dp"
+                        android:gravity="center"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:orientation="horizontal">
+
+                        <ImageView
+                            android:layout_width="16dp"
+                            android:layout_height="16dp"
+                            android:src="@drawable/ic_refresh_white"
+                            android:contentDescription="Atualizar meta" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:singleLine="true"
+                            android:text="Atualizar meta"
+                            android:textColor="#FFFFFF"
+                            android:fontFamily="@font/plus_jakarta_sans"
+                            android:textStyle="bold"
+                            android:textSize="14sp" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <!-- 5. Monitoramento -->
+                <LinearLayout
+                    android:id="@+id/cardMonitoringToggle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:layout_marginBottom="4dp"
+                    android:background="@drawable/bg_light_monitor_off"
+                    android:padding="14dp"
+                    android:elevation="2dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <FrameLayout
+                        android:id="@+id/flMonitoringIconContainer"
+                        android:layout_width="42dp"
+                        android:layout_height="42dp"
+                        android:background="@drawable/bg_light_circle_orange"
+                        android:padding="11dp">
+
+                        <ImageView
+                            android:id="@+id/ivMonitoringPowerIcon"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:src="@drawable/ic_power_off"
+                            app:tint="@color/drifly_orange"
+                            android:contentDescription="Status do monitoramento" />
+                    </FrameLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="12dp"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/tvMonitoringTitle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:singleLine="true"
+                            android:text="Ligar monitoramento"
+                            android:textColor="@color/drifly_ink"
+                            android:fontFamily="@font/plus_jakarta_sans"
+                            android:textStyle="bold"
+                            android:textSize="13.5sp" />
+
+                        <TextView
+                            android:id="@+id/tvMonitoringSubtitle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:singleLine="true"
+                            android:ellipsize="end"
+                            android:text="Último turno: 0,0 km"
+                            android:textColor="@color/drifly_mut"
+                            android:fontFamily="@font/plus_jakarta_sans"
+                            android:textSize="12sp" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/tvMonitoringBadge"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:background="@drawable/bg_light_pill_orange"
+                        android:paddingHorizontal="11dp"
+                        android:paddingVertical="5dp"
+                        android:singleLine="true"
+                        android:text="Desligado"
+                        android:textColor="@color/drifly_orange_deep"
+                        android:fontFamily="@font/plus_jakarta_sans"
+                        android:textStyle="bold"
+                        android:textSize="11.5sp" />
+                </LinearLayout>
+
+            </LinearLayout>
+        </ScrollView>
+
+        <!-- ABA 2 (NOVA): GESTÃO FINANCEIRA COMPLETA & SALÁRIO REAL -->
+        <ScrollView
+            android:id="@+id/viewTabManagement"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fillViewport="true"
+            android:overScrollMode="never"
+            android:visibility="gone">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingHorizontal="18dp"
+                android:paddingTop="6dp"
+                android:paddingBottom="28dp">
+
+                <!-- SEÇÃO A: SELETOR DE COMPETÊNCIA MENSAL -->
+                <LinearLayout
+                    android:id="@+id/layoutMonthSelector"
+                    android:layout_width="match_parent"
+                    android:layout_height="44dp"
+                    android:layout_marginBottom="12dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <ImageButton
+                        android:id="@+id/btnPrevMonth"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:background="@drawable/bg_light_circle"
+                        android:padding="10dp"
+                        android:rotation="180"
+                        android:scaleType="fitCenter"
+                        android:src="@drawable/ic_chevron_right"
+                        app:tint="@color/drifly_icon"
+                        android:contentDescription="Mês Anterior" />
+
+                    <LinearLayout
+                        android:id="@+id/btnCurrentMonthChip"
+                        android:layout_width="0dp"
+                        android:layout_height="40dp"
+                        android:layout_weight="1"
+                        android:layout_marginHorizontal="10dp"
+                        android:background="@drawable/bg_light_card"
+                        android:paddingHorizontal="12dp"
+                        android:gravity="center"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:orientation="horizontal">
+
+                        <ImageView
+                            android:layout_width="16dp"
+                            android:layout_height="16dp"
+                            android:src="@drawable/ic_calendar_orange"
+                            android:contentDescription="Competência" />
+
+                        <TextView
+                            android:id="@+id/tvSelectedMonthLabel"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:text="NOVEMBRO 2026"
+                            android:textColor="@color/drifly_ink"
+                            android:fontFamily="@font/plus_jakarta_sans"
+                            android:textStyle="bold"
+                            android:letterSpacing="0.04"
+                            android:textSize="13sp" />
+
+                        <TextView
+                            android:id="@+id/tvMonthStatusPill"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:background="@drawable/bg_light_pill_orange"
+                            android:paddingHorizontal="8dp"
+                            android:paddingVertical="2dp"
+                            android:text="ATUAL"
+                            android:textColor="@color/drifly_orange"
+                            android:fontFamily="@font/plus_jakarta_sans"
+                            android:textStyle="bold"
+                            android:textSize="10sp" />
+                    </LinearLayout>
+
+                    <ImageButton
+                        android:id="@+id/btnNextMonth"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:background="@drawable/bg_light_circle"
+                        android:padding="10dp"
+                        android:scaleType="fitCenter"
+                        android:src="@drawable/ic_chevron_right"
+                        app:tint="@color/drifly_icon"
+                        android:contentDescription="Próximo Mês" />
+                </LinearLayout>
+
+                <!-- SEÇÃO B: HERO CARD PRINCIPAL (SALÁRIO REAL + MÉDIA + DIA DA ALFORRIA) -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_light_card"
+                    android:padding="18dp"
+                    android:orientation="vertical">
+
+                    <!-- Cabeçalho Hero + Badge de Tendência -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <ImageView
+                            android:layout_width="18dp"
+                            android:layout_height="18dp"
+                            android:src="@drawable/ic_metric_profit_up"
+                            android:contentDescription="Salário Real" />
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginStart="7dp"
+                            android:text="Salário real do mês"
+                            android:textColor="@color/drifly_mut"
+                            android:fontFamily="@font/plus_jakarta_sans"
+                            android:textStyle="bold"
+                            android:letterSpacing="0.05"
+                            android:textSize="11sp" />
+
+                        <TextView
+                            android:id="@+id/btnInfoHero"
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:layout_marginStart="6dp"
+                            android:background="@drawable/bg_info_dot"
+                            android:gravity="center"
+                            android:text="i"
+                            android:textColor="#F1F5F9"
+                            android:fontFamily="@font/plus_jakarta_sans"
+                            android:textStyle="bold"
+                            android:textSize="11sp" />
+
+                        <TextView
+                            android:id="@+id/tvSalaryTrendBadge"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/bg_light_pill_green"
+                            android:paddingHorizontal="9dp"
+                            android:paddingVertical="3dp"
+                            android:text="NO RITMO"
+                            android:textColor="@color/drifly_green"
+                            android:fontFamily="@font/plus_jakarta_sans"
+                            android:textStyle="bold"
+                            android:textSize="10sp" />
+                    </LinearLayout>
+
+                    <!-- Livre hoje: número grande -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="14dp"
+                        android:text="Livre hoje"
+                        android:textColor="@color/drifly_mut"
+                        android:fontFamily="@font/plus_jakarta_sans"
+                        android:textStyle="bold"
+                        android:textSize="12.5sp" />
+
+                    <TextView
+                        android:id="@+id/tvRealSalaryHero"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:singleLine="true"
+                        android:text="R$ 0,00"
+                        android:textColor="@color/drifly_ink"
+                        android:fontFamily="@font/plus_jakarta_sans"
+                        android:textStyle="bold"
+                        android:letterSpacing="-0.03"
+                        android:textSize="32sp" />
+
+                    <!-- Caixa em mãos e reservado para contas -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:singleLine="true"
+                            android:text="Caixa em mãos"
+                            android:textColor="@color/drifly_mut"
+                            android:fontFamily="@font/plus_jakarta_sans"
+                            android:textStyle="bold"
+                            android:textSize="12.5sp" />
+
+                        <TextView
+                            android:id="@+id/tvPocketCashValue"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:singleLine="true"
+                            android:text="R$ 0,00"
+                            android:textColor="@color/drifly_ink"
+                            android:fontFamily="@font/plus_jakarta_sans"
+                            android:textStyle="bold"
+                            android:textSize="14sp" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="3dp"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:singleLine="true"
+                            android:text="Reservado para contas"
+                            android:textColor="@color/drifly_mut"
+                            android:fontFamily="@font/plus_jakarta_sans"
+                            android:textStyle="bold"
+                            android:textSize="12.5sp" />
+
+                        <TextView
+                            android:id="@+id/tvReservedValue"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:singleLine="true"
+                            android:text="R$ 0,00"
+                            android:textColor="@color/drifly_ink"
+                            android:fontFamily="@font/plus_jakarta_sans"
+                            android:textStyle="bold"
+                            android:textSize="14sp" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/tvInfoHero"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:background="@drawable/bg_light_info"
+                        android:padding="10dp"
+                        android:text="Livre hoje = caixa em mãos menos o reservado para contas, nunca abaixo de zero.\nCaixa em mãos = lucro limpo menos as contas já pagas.\nReservado = contas do mês ainda não pagas."
+                        android:textColor="@color/drifly_ink"
+                        android:fontFamily="@font/plus_jakarta_sans"
+                        android:textSize="11.5sp"
+                        android:visibility="gone" />
+
+                    <!-- Sub-Grid Duplo: Média Salarial Mensal vs Projeção Fim do Mês -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="14dp"
+                        android:background="@drawable/bg_light_inner"
+                        android:padding="12dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <!-- Coluna 1: Média Salarial Mensal -->
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Média salarial"
+                                android:textColor="@color/drifly_mut"
+                                android:fontFamily="@font/plus_jakarta_sans"
+                                android:textStyle="bold"
+                                android:textSize="12.5sp" />
+
+                            <TextView
+                                android:id="@+id/tvAvgMonthlySalary"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
+                                android:text="R$ 0,00 / mês"
+                                android:textColor="@color/drifly_ink"
+                                android:fontFamily="@font/plus_jakarta_sans"
+                                android:textStyle="bold"
+                                android:textSize="15sp" />
+
+                            <TextView
+                                android:id="@+id/tvAvgSalaryContext"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="2dp"
+                                android:text="Estimada (1º mês em curso)"
+                                android:textColor="@color/drifly_mut"
+                                android:fontFamily="@font/plus_jakarta_sans"
+                                android:textSize="10sp" />
+                        </LinearLayout>
+
+                        <View
+                            android:layout_width="1dp"
+                            android:layout_height="42dp"
+                            android:layout_marginHorizontal="10dp"
+                            android:background="@color/drifly_line" />
+
+                        <!-- Coluna 2: Projeção Fim do Mês -->
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Projeção do mês"
+                                android:textColor="@color/drifly_orange"
+                                android:fontFamily="@font/plus_jakarta_sans"
+                                android:textStyle="bold"
+                                android:textSize="12.5sp" />
+
+                            <TextView
+                                android:id="@+id/tvProjectedMonthlySalary"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
+                                android:text="R$ 0,00 livres"
+                                android:textColor="@color/drifly_green"
+                                android:fontFamily="@font/plus_jakarta_sans"
+                                android:textStyle="bold"
+                                android:textSize="15sp" />
+
+                            <TextView
+                                android:id="@+id/tvProjectedContext"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="2dp"
+                                android:text="Mantendo seu ritmo atual"
+                                android:textColor="@color/drifly_mut"
+                                android:fontFamily="@font/plus_jakarta_sans"
+                                android:textSize="10sp" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <!-- Ponto de Equilíbrio Mensal ("Dia da Alforria") -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="14dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Ponto de equilíbrio"
+                            android:textColor="@color/drifly_mut"
+                            android:fontFamily="@font/plus_jakarta_sans"
+                            android:textStyle="bold"
+                            android:letterSpacing="0.04"
+                            android:textSize="10sp" />
+
+                        <TextView
+                            android:id="@+id/tvBreakEvenPercent"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0% coberto"
+                            android:textColor="@color/drifly_orange"
+                            android:fontFamily="@font/plus_jakarta_sans"
+                            android:textStyle="bold"
+                            android:textSize="11sp" />
+                    </LinearLayout>
+
+                    <ProgressBar
+                        android:id="@+id/pbBreakEven"
+                        style="?android:attr/progressBarStyleHorizontal"
+                        android:layout_width="match_parent"
+                        android:layout_height="8dp"
+                        android:minHeight="8dp"
+                        android:maxHeight="8dp"
+                        android:layout_marginTop="8dp"
+                        android:max="100"
+                        android:progress="0"
+                        android:progressDrawable="@drawable/progress_bar_light" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:background="@drawable/bg_light_amber"
+                        android:padding="11dp"
+                        android:orientation="horizontal">
+
+                        <ImageView
+                            android:layout_width="16dp"
+                            android:layout_height="16dp"
+                            android:layout_marginTop="1dp"
+                            android:src="@drawable/ic_banner_alert"
+                            app:tint="@color/drifly_amber"
+                            android:contentDescription="@null" />
+
+                        <TextView
+                            android:id="@+id/tvFreedomDayStatus"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="9dp"
+                            android:text="Cadastre suas contas do mês para descobrir seu Dia da Alforria."
+                            android:textColor="@color/drifly_amber"
+                            android:fontFamily="@font/plus_jakarta_sans"
+                            android:textSize="12.5sp" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <!-- SEÇÃO C: CASCATA DO DINHEIRO (PISTA -> CONTAS -> SEU BOLSO) -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:background="@drawable/bg_light_card"
+                    android:padding="18dp"
+                    android:orientation="vertical">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <ImageView
+                            android:layout_width="18dp"
+                            android:layout_height="18dp"
+                            android:src="@drawable/ic_metric_wallet"
+                            android:contentDescription="Cascata do Dinheiro" />
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginStart="8dp"
+                            android:text="Do volante ao seu bolso"
+                            android:textColor="@color/drifly_mut"
+                            android:fontFamily="@font/plus_jakarta_sans"
+                            android:textStyle="bold"
+                            android:letterSpacing="0.05"
+                            android:textSize="11sp" />
+
+                        <TextView
+                            android:id="@+id/btnInfoCascade"
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:layout_marginStart="6dp"
+                            android:background="@drawable/bg_info_dot"
+                            android:gravity="center"
+                            android:text="i"
+                            android:textColor="#F1F5F9"
+                            android:fontFamily="@font/plus_jakarta_sans"
+                            android:textStyle="bold"
+                            android:textSize="11sp" />
+
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/tvInfoCascade"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:background="@drawable/bg_light_info"
+                        android:padding="10dp"
+                        android:text="Faturamento bruto menos os custos da pista chega ao lucro limpo. Depois descontamos todas as contas do mês, pagas e a pagar, para encontrar o salário real livre."
+                        android:textColor="@color/drifly_ink"
+                        android:fontFamily="@font/plus_jakarta_sans"
+                        android:textSize="11.5sp"
+                        android:visibility="gone" />
+
+                    <!-- Linha 1: Faturamento Bruto -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Faturamento bruto"
+                            android:textColor="@color/drifly_mut"
+                            android:fontFamily="@font/plus_jakarta_sans"
+                            android:textSize="13sp" />
+
+                        <TextView
+                            android:id="@+id/tvCascadeGross"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="R$ 0,00"
+                            android:textColor="@color/drifly_ink"
+                            android:fontFamily="@font/plus_jakarta_sans"
+                            android:textStyle="bold"
+                            android:textSize="14sp" />
+                    </LinearLayout>
+
+                    <!-- Linha 2: Custos Operacionais de Pista -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Custos da pista"
+                            android:textColor="@color/drifly_mut"
+                            android:fontFamily="@font/plus_jakarta_sans"
+                            android:textSize="13sp" />
+
+                        <TextView
+                            android:id="@+id/btnInfoPista"
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:layout_marginStart="6dp"
+                            android:background="@drawable/bg_info_dot"
+                            android:gravity="center"
+                            android:text="i"
+                            android:textColor="#F1F5F9"
+                            android:fontFamily="@font/plus_jakarta_sans"
+                            android:textStyle="bold"
+                            android:textSize="11sp" />
+
+
+                        <TextView
+                            android:id="@+id/tvCascadeStreetCosts"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="- R$ 0,00"
+                            android:textColor="@color/drifly_red"
+                            android:fontFamily="@font/plus_jakarta_sans"
+                            android:textStyle="bold"
+                            android:textSize="14sp" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/tvCascadeStreetCostsDetail"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:background="@drawable/bg_light_info"
+                        android:padding="10dp"
+                        android:text="Desgaste/Combustível KM: R$ 0,00 • Despesas Rápidas: R$ 0,00"
+                        android:textColor="@color/drifly_ink"
+                        android:fontFamily="@font/plus_jakarta_sans"
+                        android:textSize="11.5sp"
+                        android:visibility="gone" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginVertical="10dp"
+                        android:background="@color/drifly_line" />
+
+                    <!-- Linha 3: Lucro Operacional da Pista -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Lucro limpo da pista"
+                            android:textColor="@color/drifly_ink"
+                            android:fontFamily="@font/plus_jakarta_sans"
+                            android:textStyle="bold"
+                            android:textSize="13sp" />
+
+                        <TextView
+                            android:id="@+id/tvCascadeOpProfit"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="R$ 0,00"
+                            android:textColor="@color/drifly_ink"
+                            android:fontFamily="@font/plus_jakarta_sans"
+                            android:textStyle="bold"
+                            android:textSize="15sp" />
+                    </LinearLayout>
+
+                    <!-- Linha 4: Compromissos, Parcelas e Contas do Mês -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Contas do mês"
+                            android:textColor="@color/drifly_mut"
+                            android:fontFamily="@font/plus_jakarta_sans"
+                            android:textSize="13sp" />
+
+                        <TextView
+                            android:id="@+id/btnInfoObligations"
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:layout_marginStart="6dp"
+                            android:background="@drawable/bg_info_dot"
+                            android:gravity="center"
+                            android:text="i"
+                            android:textColor="#F1F5F9"
+                            android:fontFamily="@font/plus_jakarta_sans"
+                            android:textStyle="bold"
+                            android:textSize="11sp" />
+
+
+                        <TextView
+                            android:id="@+id/tvCascadeObligations"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="- R$ 0,00"
+                            android:textColor="@color/drifly_amber"
+                            android:fontFamily="@font/plus_jakarta_sans"
+                            android:textStyle="bold"
+                            android:textSize="14sp" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/tvCascadeObligationsDetail"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:background="@drawable/bg_light_info"
+                        android:padding="10dp"
+                        android:text="Já pagas: R$ 0,00 • Faltam pagar: R$ 0,00"
+                        android:textColor="@color/drifly_ink"
+                        android:fontFamily="@font/plus_jakarta_sans"
+                        android:textSize="11.5sp"
+                        android:visibility="gone" />
+
+                    <!-- Linha 5: Resultado Final (Salário Real no Bolso) -->
+                    <LinearLayout
+                        android:id="@+id/layoutRealSalaryTotal"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:background="@drawable/bg_light_red_soft"
+                        android:padding="12dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Salário real livre"
+                            android:textColor="@color/drifly_ink"
+                            android:fontFamily="@font/plus_jakarta_sans"
+                            android:textStyle="bold"
+                            android:textSize="12sp" />
+
+                        <TextView
+                            android:id="@+id/tvCascadeFinalSalary"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="R$ 0,00"
+                            android:textColor="@color/drifly_green"
+                            android:fontFamily="@font/plus_jakarta_sans"
+                            android:textStyle="bold"
+                            android:textSize="16sp" />
+                    </LinearLayout>
+
+                    <!-- ICR -->
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginTop="14dp"
+                        android:background="@color/drifly_line" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:singleLine="true"
+                            android:text="ICR"
+                            android:textColor="@color/drifly_ink"
+                            android:fontFamily="@font/plus_jakarta_sans"
+                            android:textStyle="bold"
+                            android:textSize="13.5sp" />
+
+                        <TextView
+                            android:id="@+id/tvIcrChip"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/bg_light_pill_red"
+                            android:paddingHorizontal="10dp"
+                            android:paddingVertical="4dp"
+                            android:singleLine="true"
+                            android:text="0% · Saudável"
+                            android:textColor="@color/drifly_red"
+                            android:fontFamily="@font/plus_jakarta_sans"
+                            android:textStyle="bold"
+                            android:textSize="11.5sp" />
+                    </LinearLayout>
+
+                    <ProgressBar
+                        android:id="@+id/pbIcr"
+                        style="?android:attr/progressBarStyleHorizontal"
+                        android:layout_width="match_parent"
+                        android:layout_height="8dp"
+                        android:layout_marginTop="8dp"
+                        android:minHeight="8dp"
+                        android:maxHeight="8dp"
+                        android:max="100"
+                        android:progress="0"
+                        android:progressDrawable="@drawable/progress_bar_light_red" />
+
+                    <TextView
+                        android:id="@+id/tvIcrDiagnostic"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="Comprometimento da renda: parte do que você ganha que vai para as contas."
+                        android:textColor="@color/drifly_mut"
+                        android:fontFamily="@font/plus_jakarta_sans"
+                        android:textSize="11.5sp" />
+                </LinearLayout>
+
+<!-- SEÇÃO D: BOTÃO CTA PRIMÁRIO + CARD RADAR DE 7 DIAS -->
+
+<!-- Card Radar de Pressão de 7 Dias -->
+                <LinearLayout
+                    android:id="@+id/layoutDueSoonRadar"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:background="@drawable/bg_light_strip"
+                    android:padding="14dp"
+                    android:orientation="vertical"
+                    android:visibility="gone">
+
+                    <TextView
+                        android:id="@+id/tvDueSoonRadarTitle"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="⚡ Radar de Vencimentos (Próximos 7 Dias)"
+                        android:textColor="@color/drifly_amber"
+                        android:fontFamily="@font/plus_jakarta_sans"
+                        android:textStyle="bold"
+                        android:textSize="13sp" />
+
+                    <TextView
+                        android:id="@+id/tvDueSoonRadarSubtitle"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="3dp"
+                        android:text="Nenhuma conta urgente para os próximos 7 dias."
+                        android:textColor="@color/drifly_ink"
+                        android:fontFamily="@font/plus_jakarta_sans"
+                        android:textSize="12sp" />
+                </LinearLayout>
+
+                
+
+                <RelativeLayout
+                    android:id="@+id/btnAddObligation"
+                    android:layout_width="match_parent"
+                    android:layout_height="58dp"
+                    android:layout_marginTop="16dp"
+                    android:background="@drawable/bg_light_btn_primary"
+                    android:elevation="12dp"
+                    android:outlineAmbientShadowColor="@color/drifly_orange"
+                    android:outlineSpotShadowColor="@color/drifly_orange"
+                    android:paddingHorizontal="20dp"
+                    android:clickable="true"
+                    android:focusable="true">
+
+                    <ImageView
+                        android:id="@+id/ivAddObligationPlus"
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
+                        android:layout_alignParentStart="true"
+                        android:layout_centerVertical="true"
+                        android:src="@drawable/ic_plus_white"
+                        android:contentDescription="Adicionar Compromisso" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_toEndOf="@id/ivAddObligationPlus"
+                        android:layout_centerVertical="true"
+                        android:layout_marginStart="14dp"
+                        android:text="Adicionar Conta, Parcela ou Dívida"
+                        android:textColor="#FFFFFF"
+                        android:fontFamily="@font/plus_jakarta_sans"
+                        android:textStyle="bold"
+                        android:textSize="15sp" />
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
+                        android:src="@drawable/ic_chevron_right"
+                        android:contentDescription="Abrir" />
+                </RelativeLayout>
+
+                <!-- SEÇÃO E: CHIPS DE FILTRO RÁPIDO + LISTA DE CONTAS/DÍVIDAS + EMPTY STATE -->
+                <HorizontalScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:scrollbars="none"
+                    android:overScrollMode="never">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:id="@+id/chipFilterAll"
+                            android:layout_width="wrap_content"
+                            android:layout_height="36dp"
+                            android:background="@drawable/bg_chip_selected"
+                            android:paddingHorizontal="14dp"
+                            android:gravity="center"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:text="Todas"
+                            android:textColor="#FFFFFF"
+                            android:fontFamily="@font/plus_jakarta_sans"
+                            android:textStyle="bold"
+                            android:textSize="12sp" />
+
+                        <TextView
+                            android:id="@+id/chipFilterInstallments"
+                            android:layout_width="wrap_content"
+                            android:layout_height="36dp"
+                            android:layout_marginStart="8dp"
+                            android:background="@drawable/bg_light_chip"
+                            android:paddingHorizontal="14dp"
+                            android:gravity="center"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:text="Parcelamentos"
+                            android:textColor="@color/drifly_mut"
+                            android:fontFamily="@font/plus_jakarta_sans"
+                            android:textStyle="bold"
+                            android:textSize="12sp" />
+
+                        <TextView
+                            android:id="@+id/chipFilterFixed"
+                            android:layout_width="wrap_content"
+                            android:layout_height="36dp"
+                            android:layout_marginStart="8dp"
+                            android:background="@drawable/bg_light_chip"
+                            android:paddingHorizontal="14dp"
+                            android:gravity="center"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:text="Contas Fixas"
+                            android:textColor="@color/drifly_mut"
+                            android:fontFamily="@font/plus_jakarta_sans"
+                            android:textStyle="bold"
+                            android:textSize="12sp" />
+
+                        <TextView
+                            android:id="@+id/chipFilterDebts"
+                            android:layout_width="wrap_content"
+                            android:layout_height="36dp"
+                            android:layout_marginStart="8dp"
+                            android:background="@drawable/bg_light_chip"
+                            android:paddingHorizontal="14dp"
+                            android:gravity="center"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:text="Cartão &amp; Dívidas"
+                            android:textColor="@color/drifly_mut"
+                            android:fontFamily="@font/plus_jakarta_sans"
+                            android:textStyle="bold"
+                            android:textSize="12sp" />
+
+                        <TextView
+                            android:id="@+id/chipFilterVariable"
+                            android:layout_width="wrap_content"
+                            android:layout_height="36dp"
+                            android:layout_marginStart="8dp"
+                            android:background="@drawable/bg_light_chip"
+                            android:paddingHorizontal="14dp"
+                            android:gravity="center"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:text="Gastos do Mês"
+                            android:textColor="@color/drifly_mut"
+                            android:fontFamily="@font/plus_jakarta_sans"
+                            android:textStyle="bold"
+                            android:textSize="12sp" />
+                    </LinearLayout>
+                </HorizontalScrollView>
+
+                <!-- Container Dinâmico das Contas/Parcelas/Dívidas do Mês -->
+                <LinearLayout
+                    android:id="@+id/layoutObligationsList"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:orientation="vertical" />
+
+                <!-- Empty State Interativo (Quando não há contas cadastradas) -->
+                <LinearLayout
+                    android:id="@+id/layoutEmptyObligations"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:background="@drawable/bg_light_card"
+                    android:padding="18dp"
+                    android:gravity="center_horizontal"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Comece sua Gestão Financeira em 1 Toque"
+                        android:textColor="@color/drifly_ink"
+                        android:fontFamily="@font/plus_jakarta_sans"
+                        android:textStyle="bold"
+                        android:textSize="15sp" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:gravity="center"
+                        android:text="Adicione a parcela ou aluguel do seu veículo, MEI e contas de casa para o DriFly revelar seu Salário Real Livre e o Dia da Alforria."
+                        android:textColor="@color/drifly_mut"
+                        android:fontFamily="@font/plus_jakarta_sans"
+                        android:textSize="12sp" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="14dp"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:id="@+id/btnQuickPresetVehicle"
+                            android:layout_width="0dp"
+                            android:layout_height="40dp"
+                            android:layout_weight="1"
+                            android:background="@drawable/bg_light_chip"
+                            android:gravity="center"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:text="🚗 Veículo"
+                            android:textColor="@color/drifly_ink"
+                            android:fontFamily="@font/plus_jakarta_sans"
+                            android:textStyle="bold"
+                            android:textSize="12sp" />
+
+                        <TextView
+                            android:id="@+id/btnQuickPresetMei"
+                            android:layout_width="0dp"
+                            android:layout_height="40dp"
+                            android:layout_weight="1"
+                            android:layout_marginStart="8dp"
+                            android:background="@drawable/bg_light_chip"
+                            android:gravity="center"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:text="📄 MEI / IPVA"
+                            android:textColor="@color/drifly_ink"
+                            android:fontFamily="@font/plus_jakarta_sans"
+                            android:textStyle="bold"
+                            android:textSize="12sp" />
+
+                        <TextView
+                            android:id="@+id/btnQuickPresetHome"
+                            android:layout_width="0dp"
+                            android:layout_height="40dp"
+                            android:layout_weight="1"
+                            android:layout_marginStart="8dp"
+                            android:background="@drawable/bg_light_chip"
+                            android:gravity="center"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:text="🏠 Moradia"
+                            android:textColor="@color/drifly_ink"
+                            android:fontFamily="@font/plus_jakarta_sans"
+                            android:textStyle="bold"
+                            android:textSize="12sp" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <!-- SEÇÃO F: CARD DE INTELIGÊNCIA & SIMULADOR DE LIBERDADE FINANCEIRA -->
+                <LinearLayout
+                    android:id="@+id/cardFinancialInsights"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:background="@drawable/bg_light_card"
+                    android:padding="18dp"
+                    android:orientation="vertical">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <ImageView
+                            android:layout_width="18dp"
+                            android:layout_height="18dp"
+                            android:src="@drawable/ic_trending_chart"
+                            android:contentDescription="Inteligência Financeira" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:text="INTELIGÊNCIA &amp; SIMULADOR DE LIBERDADE"
+                            android:textColor="@color/drifly_orange"
+                            android:fontFamily="@font/plus_jakarta_sans"
+                            android:textStyle="bold"
+                            android:letterSpacing="0.05"
+                            android:textSize="11sp" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/tvInsightItem1"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:lineSpacingExtra="2dp"
+                        android:text="• Seus parcelamentos e contas fixas alimentam automaticamente o simulador de alívio salarial."
+                        android:textColor="@color/drifly_ink"
+                        android:fontFamily="@font/plus_jakarta_sans"
+                        android:textSize="12sp" />
+
+                    <TextView
+                        android:id="@+id/tvInsightItem2"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:lineSpacingExtra="2dp"
+                        android:text="• Acompanhe quantos dias de pista cada dívida consome do seu mês."
+                        android:textColor="@color/drifly_mut"
+                        android:fontFamily="@font/plus_jakarta_sans"
+                        android:textSize="12sp"
+                        android:visibility="gone" />
+
+                    <TextView
+                        android:id="@+id/tvInsightItem3"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:lineSpacingExtra="2dp"
+                        android:text="• Sua média salarial mensal é protegida contra meses atípicos."
+                        android:textColor="@color/drifly_mut"
+                        android:fontFamily="@font/plus_jakarta_sans"
+                        android:textSize="12sp"
+                        android:visibility="gone" />
+
+                    <!-- Botão de Sincronização de Meta Diária com a Aba 1 -->
+                    <LinearLayout
+                        android:id="@+id/btnSyncDailyGoalFromManagement"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:layout_marginTop="14dp"
+                        android:background="@drawable/bg_light_btn_primary"
+                        android:elevation="3dp"
+                        android:gravity="center"
+                        android:paddingHorizontal="14dp"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:orientation="horizontal">
+
+                        <ImageView
+                            android:layout_width="16dp"
+                            android:layout_height="16dp"
+                            android:src="@drawable/ic_target_orange"
+                            android:contentDescription="Sincronizar Meta" />
+
+                        <TextView
+                            android:id="@+id/tvSyncDailyGoalLabel"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:text="Sincronizar Meta Diária da Pista"
+                            android:textColor="#FFFFFF"
+                            android:fontFamily="@font/plus_jakarta_sans"
+                            android:textStyle="bold"
+                            android:textSize="13sp" />
+                    </LinearLayout>
+                </LinearLayout>
+
+            </LinearLayout>
+        </ScrollView>
+
+        <!-- ABA 3: CONFIGURAÇÕES DE CORRIDA & AUTOMAÇÃO -->
+        <ScrollView
+            android:id="@+id/viewTabRides"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fillViewport="true"
+            android:overScrollMode="never"
+            android:visibility="gone">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingHorizontal="18dp"
+                android:paddingTop="6dp"
+                android:paddingBottom="24dp">
+
+                <!-- Posição da Notificação na Tela -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Posição do Alerta de Corrida na Tela"
+                    android:textColor="@color/drifly_orange"
+                    android:fontFamily="@font/plus_jakarta_sans"
+                    android:textStyle="bold"
+                    android:textSize="15sp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:background="@drawable/bg_light_card"
+                    android:padding="18dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="O alerta descerá suavemente com animação na posição escolhida:"
+                        android:textColor="@color/drifly_mut"
+                        android:fontFamily="@font/plus_jakarta_sans"
+                        android:textSize="12sp" />
+
+                    <RadioGroup
+                        android:id="@+id/rgOverlayPosition"
+                        android:layout_width="1dp"
+                        android:layout_height="1dp"
+                        android:visibility="gone">
+
+                        <RadioButton
+                            android:id="@+id/rbPosTop"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="No topo" />
+
+                        <RadioButton
+                            android:id="@+id/rbPosCenter"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="No meio" />
+
+                        <RadioButton
+                            android:id="@+id/rbPosBottom"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Embaixo" />
+                    </RadioGroup>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:orientation="horizontal">
+
+                    <LinearLayout
+                        android:id="@+id/cardPosTop"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:background="@drawable/bg_pos_card"
+                        android:gravity="center_horizontal"
+                        android:orientation="vertical"
+                        android:paddingHorizontal="6dp"
+                        android:paddingVertical="10dp">
+
+                        <FrameLayout
+                            android:layout_width="30dp"
+                            android:layout_height="50dp"
+                            android:background="@drawable/bg_mini_phone">
+
+                            <View
+                                android:id="@+id/barPosTop"
+                                android:layout_width="22dp"
+                                android:layout_height="9dp"
+                                android:layout_gravity="top"
+                                android:layout_margin="4dp"
+                                android:background="@drawable/bg_mini_bar" />
+                        </FrameLayout>
+
+                        <TextView
+                            android:id="@+id/cardPosTopLabel"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="7dp"
+                            android:gravity="center"
+                            android:maxLines="1"
+                            android:text="No topo"
+                            android:textColor="@color/drifly_mut"
+                            android:fontFamily="@font/plus_jakarta_sans"
+                            android:textStyle="bold"
+                            android:textSize="12.5sp" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/cardPosCenter"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="8dp"
+                        android:background="@drawable/bg_pos_card"
+                        android:gravity="center_horizontal"
+                        android:orientation="vertical"
+                        android:paddingHorizontal="6dp"
+                        android:paddingVertical="10dp">
+
+                        <FrameLayout
+                            android:layout_width="30dp"
+                            android:layout_height="50dp"
+                            android:background="@drawable/bg_mini_phone">
+
+                            <View
+                                android:id="@+id/barPosCenter"
+                                android:layout_width="22dp"
+                                android:layout_height="9dp"
+                                android:layout_gravity="center"
+                                android:layout_margin="4dp"
+                                android:background="@drawable/bg_mini_bar" />
+                        </FrameLayout>
+
+                        <TextView
+                            android:id="@+id/cardPosCenterLabel"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="7dp"
+                            android:gravity="center"
+                            android:maxLines="1"
+                            android:text="No meio"
+                            android:textColor="@color/drifly_mut"
+                            android:fontFamily="@font/plus_jakarta_sans"
+                            android:textStyle="bold"
+                            android:textSize="12.5sp" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/cardPosBottom"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="8dp"
+                        android:background="@drawable/bg_pos_card"
+                        android:gravity="center_horizontal"
+                        android:orientation="vertical"
+                        android:paddingHorizontal="6dp"
+                        android:paddingVertical="10dp">
+
+                        <FrameLayout
+                            android:layout_width="30dp"
+                            android:layout_height="50dp"
+                            android:background="@drawable/bg_mini_phone">
+
+                            <View
+                                android:id="@+id/barPosBottom"
+                                android:layout_width="22dp"
+                                android:layout_height="9dp"
+                                android:layout_gravity="bottom"
+                                android:layout_margin="4dp"
+                                android:background="@drawable/bg_mini_bar" />
+                        </FrameLayout>
+
+                        <TextView
+                            android:id="@+id/cardPosBottomLabel"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="7dp"
+                            android:gravity="center"
+                            android:maxLines="1"
+                            android:text="Embaixo"
+                            android:textColor="@color/drifly_mut"
+                            android:fontFamily="@font/plus_jakarta_sans"
+                            android:textStyle="bold"
+                            android:textSize="12.5sp" />
+                    </LinearLayout>
+                    </LinearLayout>
+                </LinearLayout>
+
+                <!-- Automação & Aceite Inteligente -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="22dp"
+                    android:text="Aceite automático"
+                    android:textColor="@color/drifly_orange"
+                    android:fontFamily="@font/plus_jakarta_sans"
+                    android:textStyle="bold"
+                    android:textSize="15sp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:background="@drawable/bg_light_card"
+                    android:padding="18dp"
+                    android:orientation="vertical">
+
+                    <Switch
+                        android:id="@+id/swAutoAccept"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Aceitar corridas ideais"
+                        android:fontFamily="@font/plus_jakarta_sans"
+                        android:textColor="@color/drifly_ink" />
+
+                    <Switch
+                        android:id="@+id/swAutoDecline"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:text="Recusar fora do limite"
+                        android:fontFamily="@font/plus_jakarta_sans"
+                        android:textColor="@color/drifly_ink" />
+
+                    <Switch
+                        android:id="@+id/swMotoMode"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:text="Modo moto / slider"
+                        android:fontFamily="@font/plus_jakarta_sans"
+                        android:textColor="@color/drifly_ink" />
+
+                    <Switch
+                        android:id="@+id/swTapToAccept"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:text="Aceitar ao tocar no overlay"
+                        android:fontFamily="@font/plus_jakarta_sans"
+                        android:textColor="@color/drifly_ink" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginVertical="14dp"
+                        android:background="@color/drifly_line" />
+
+                                        <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:paddingVertical="10dp">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:maxLines="1"
+                                android:text="Valor mínimo por KM"
+                                android:textColor="@color/drifly_ink"
+                                android:fontFamily="@font/plus_jakarta_sans"
+                                android:textStyle="bold"
+                                android:textSize="13.5sp" />
+
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="2dp"
+                                android:maxLines="1"
+                                android:text="Abaixo disso, não aceita"
+                                android:textColor="@color/drifly_mut"
+                                android:fontFamily="@font/plus_jakarta_sans"
+                                android:textSize="12sp" />
+                        </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="122dp"
+                        android:layout_height="42dp"
+                        android:background="@drawable/bg_light_field"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:paddingHorizontal="10dp">
+
+                        <EditText
+                            android:id="@+id/etMinRate"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:background="@null"
+                            android:padding="0dp"
+                            android:hint="2,20"
+                            android:textColor="@color/drifly_ink"
+                            android:textColorHint="@color/drifly_mut"
+                            android:fontFamily="@font/plus_jakarta_sans"
+                            android:textStyle="bold"
+                            android:textSize="15sp"
+                            android:gravity="end"
+                            android:inputType="numberDecimal"
+                            android:digits="0123456789,." />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="4dp"
+                            android:text="R$/km"
+                            android:textColor="@color/drifly_mut"
+                            android:fontFamily="@font/plus_jakarta_sans"
+                            android:textStyle="bold"
+                            android:textSize="12sp" />
+
+                    </LinearLayout>
+                    </LinearLayout>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/drifly_line" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:paddingVertical="10dp">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:maxLines="1"
+                                android:text="Distância máxima total"
+                                android:textColor="@color/drifly_ink"
+                                android:fontFamily="@font/plus_jakarta_sans"
+                                android:textStyle="bold"
+                                android:textSize="13.5sp" />
+
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="2dp"
+                                android:maxLines="1"
+                                android:text="Ida e corrida somadas"
+                                android:textColor="@color/drifly_mut"
+                                android:fontFamily="@font/plus_jakarta_sans"
+                                android:textSize="12sp" />
+                        </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="122dp"
+                        android:layout_height="42dp"
+                        android:background="@drawable/bg_light_field"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:paddingHorizontal="10dp">
+
+                        <EditText
+                            android:id="@+id/etMaxDist"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:background="@null"
+                            android:padding="0dp"
+                            android:hint="12,0"
+                            android:textColor="@color/drifly_ink"
+                            android:textColorHint="@color/drifly_mut"
+                            android:fontFamily="@font/plus_jakarta_sans"
+                            android:textStyle="bold"
+                            android:textSize="15sp"
+                            android:gravity="end"
+                            android:inputType="numberDecimal"
+                            android:digits="0123456789,." />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="4dp"
+                            android:text="km"
+                            android:textColor="@color/drifly_mut"
+                            android:fontFamily="@font/plus_jakarta_sans"
+                            android:textStyle="bold"
+                            android:textSize="12sp" />
+
+                    </LinearLayout>
+                    </LinearLayout>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/drifly_line" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:paddingVertical="10dp">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:maxLines="1"
+                                android:text="Nota mínima do passageiro"
+                                android:textColor="@color/drifly_ink"
+                                android:fontFamily="@font/plus_jakarta_sans"
+                                android:textStyle="bold"
+                                android:textSize="13.5sp" />
+
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="2dp"
+                                android:maxLines="1"
+                                android:text="Bloqueia se for menor"
+                                android:textColor="@color/drifly_mut"
+                                android:fontFamily="@font/plus_jakarta_sans"
+                                android:textSize="12sp" />
+                        </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="122dp"
+                        android:layout_height="42dp"
+                        android:background="@drawable/bg_light_field"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:paddingHorizontal="10dp">
+
+                        <EditText
+                            android:id="@+id/etMinRating"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:background="@null"
+                            android:padding="0dp"
+                            android:hint="4,75"
+                            android:textColor="@color/drifly_ink"
+                            android:textColorHint="@color/drifly_mut"
+                            android:fontFamily="@font/plus_jakarta_sans"
+                            android:textStyle="bold"
+                            android:textSize="15sp"
+                            android:gravity="end"
+                            android:inputType="numberDecimal"
+                            android:digits="0123456789,." />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="4dp"
+                            android:text="★"
+                            android:textColor="@color/drifly_mut"
+                            android:fontFamily="@font/plus_jakarta_sans"
+                            android:textStyle="bold"
+                            android:textSize="12sp" />
+
+                    </LinearLayout>
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <!-- Custos do Veículo -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="22dp"
+                    android:text="Custos do veículo"
+                    android:textColor="@color/drifly_orange"
+                    android:fontFamily="@font/plus_jakarta_sans"
+                    android:textStyle="bold"
+                    android:textSize="15sp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:background="@drawable/bg_light_card"
+                    android:padding="18dp"
+                    android:orientation="vertical">
+
+                                        <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:paddingVertical="10dp">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:maxLines="1"
+                                android:text="Preço do litro"
+                                android:textColor="@color/drifly_ink"
+                                android:fontFamily="@font/plus_jakarta_sans"
+                                android:textStyle="bold"
+                                android:textSize="13.5sp" />
+
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="2dp"
+                                android:maxLines="1"
+                                android:text="Combustível"
+                                android:textColor="@color/drifly_mut"
+                                android:fontFamily="@font/plus_jakarta_sans"
+                                android:textSize="12sp" />
+                        </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="122dp"
+                        android:layout_height="42dp"
+                        android:background="@drawable/bg_light_field"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:paddingHorizontal="10dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="4dp"
+                            android:text="R$"
+                            android:textColor="@color/drifly_mut"
+                            android:fontFamily="@font/plus_jakarta_sans"
+                            android:textStyle="bold"
+                            android:textSize="12sp" />
+
+                        <EditText
+                            android:id="@+id/etFuelPrice"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:background="@null"
+                            android:padding="0dp"
+                            android:hint="5,73"
+                            android:textColor="@color/drifly_ink"
+                            android:textColorHint="@color/drifly_mut"
+                            android:fontFamily="@font/plus_jakarta_sans"
+                            android:textStyle="bold"
+                            android:textSize="15sp"
+                            android:gravity="end"
+                            android:inputType="numberDecimal"
+                            android:digits="0123456789,." />
+
+                    </LinearLayout>
+                    </LinearLayout>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/drifly_line" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:paddingVertical="10dp">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:maxLines="1"
+                                android:text="Consumo médio"
+                                android:textColor="@color/drifly_ink"
+                                android:fontFamily="@font/plus_jakarta_sans"
+                                android:textStyle="bold"
+                                android:textSize="13.5sp" />
+
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="2dp"
+                                android:maxLines="1"
+                                android:text="KM por litro"
+                                android:textColor="@color/drifly_mut"
+                                android:fontFamily="@font/plus_jakarta_sans"
+                                android:textSize="12sp" />
+                        </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="122dp"
+                        android:layout_height="42dp"
+                        android:background="@drawable/bg_light_field"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:paddingHorizontal="10dp">
+
+                        <EditText
+                            android:id="@+id/etFuelConsumption"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:background="@null"
+                            android:padding="0dp"
+                            android:hint="31,0"
+                            android:textColor="@color/drifly_ink"
+                            android:textColorHint="@color/drifly_mut"
+                            android:fontFamily="@font/plus_jakarta_sans"
+                            android:textStyle="bold"
+                            android:textSize="15sp"
+                            android:gravity="end"
+                            android:inputType="numberDecimal"
+                            android:digits="0123456789,." />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="4dp"
+                            android:text="km/l"
+                            android:textColor="@color/drifly_mut"
+                            android:fontFamily="@font/plus_jakarta_sans"
+                            android:textStyle="bold"
+                            android:textSize="12sp" />
+
+                    </LinearLayout>
+                    </LinearLayout>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/drifly_line" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:paddingVertical="10dp">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:maxLines="1"
+                                android:text="Manutenção e pneus"
+                                android:textColor="@color/drifly_ink"
+                                android:fontFamily="@font/plus_jakarta_sans"
+                                android:textStyle="bold"
+                                android:textSize="13.5sp" />
+
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="2dp"
+                                android:maxLines="1"
+                                android:text="Desgaste por KM rodado"
+                                android:textColor="@color/drifly_mut"
+                                android:fontFamily="@font/plus_jakarta_sans"
+                                android:textSize="12sp" />
+                        </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="122dp"
+                        android:layout_height="42dp"
+                        android:background="@drawable/bg_light_field"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:paddingHorizontal="10dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="4dp"
+                            android:text="R$"
+                            android:textColor="@color/drifly_mut"
+                            android:fontFamily="@font/plus_jakarta_sans"
+                            android:textStyle="bold"
+                            android:textSize="12sp" />
+
+                        <EditText
+                            android:id="@+id/etMaintenance"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:background="@null"
+                            android:padding="0dp"
+                            android:hint="0,03"
+                            android:textColor="@color/drifly_ink"
+                            android:textColorHint="@color/drifly_mut"
+                            android:fontFamily="@font/plus_jakarta_sans"
+                            android:textStyle="bold"
+                            android:textSize="15sp"
+                            android:gravity="end"
+                            android:inputType="numberDecimal"
+                            android:digits="0123456789,." />
+
+                    </LinearLayout>
+                    </LinearLayout>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginTop="4dp"
+                        android:background="@color/drifly_line" />
+
+                    <!-- Nível do tanque (bolinha flutuante) -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:paddingVertical="10dp">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:maxLines="1"
+                                android:text="Nível do tanque"
+                                android:textColor="@color/drifly_ink"
+                                android:fontFamily="@font/plus_jakarta_sans"
+                                android:textStyle="bold"
+                                android:textSize="13.5sp" />
+
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="2dp"
+                                android:maxLines="1"
+                                android:text="Simulação da bolinha"
+                                android:textColor="@color/drifly_mut"
+                                android:fontFamily="@font/plus_jakarta_sans"
+                                android:textSize="12sp" />
+                        </LinearLayout>
+
+                        <SeekBar
+                            android:id="@+id/sbFuelLevel"
+                            android:layout_width="104dp"
+                            android:layout_height="wrap_content"
+                            android:max="100"
+                            android:progressTint="@color/drifly_orange"
+                            android:thumbTint="@color/drifly_orange" />
+
+                        <TextView
+                            android:id="@+id/tvFuelLevelValue"
+                            android:layout_width="42dp"
+                            android:layout_height="wrap_content"
+                            android:gravity="end"
+                            android:maxLines="1"
+                            android:text="62%"
+                            android:textColor="@color/drifly_ink"
+                            android:fontFamily="@font/plus_jakarta_sans"
+                            android:textStyle="bold"
+                            android:textSize="13sp" />
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <!-- Modo Casa (Fim de Turno) -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="22dp"
+                    android:text="Modo casa"
+                    android:textColor="@color/drifly_orange"
+                    android:fontFamily="@font/plus_jakarta_sans"
+                    android:textStyle="bold"
+                    android:textSize="15sp" />
+
+                <LinearLayout
+                    android:id="@+id/cardConfigModoCasa"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:background="@drawable/bg_light_card"
+                    android:padding="18dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Defina seu endereço residencial para calcular automaticamente se a corrida te aproxima de casa no final do turno:"
+                        android:textColor="@color/drifly_mut"
+                        android:fontFamily="@font/plus_jakarta_sans"
+                        android:textSize="12sp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:text="Endereço da sua Residência:"
+                        android:textColor="@color/drifly_mut"
+                        android:fontFamily="@font/plus_jakarta_sans"
+                        android:textSize="13sp" />
+
+                    <EditText
+                        android:id="@+id/etHomeAddress"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:layout_marginTop="6dp"
+                        android:background="@drawable/bg_light_field"
+                        android:paddingHorizontal="14dp"
+                        android:hint="Ex: Rua das Palmeiras, 320, São Paulo"
+                        android:textColor="@color/drifly_ink"
+                        android:textColorHint="@color/drifly_mut"
+                        android:fontFamily="@font/plus_jakarta_sans"
+                        android:textSize="13sp"
+                        android:inputType="textPostalAddress" />
+
+                    <Button
+                        android:id="@+id/btnSaveHomeAddress"
+                        android:layout_width="match_parent"
+                        android:layout_height="44dp"
+                        android:layout_marginTop="10dp"
+                        app:backgroundTint="@null"
+                        android:background="@drawable/bg_light_btn_secondary"
+                        android:textColor="@color/drifly_ink"
+                        android:fontFamily="@font/plus_jakarta_sans"
+                        android:textStyle="bold"
+                        android:textSize="13sp"
+                        android:text="Salvar Endereço Residencial" />
+
+                    <Button
+                        android:id="@+id/btnUseCurrentLocationAsHome"
+                        android:layout_width="match_parent"
+                        android:layout_height="44dp"
+                        android:layout_marginTop="8dp"
+                        app:backgroundTint="@null"
+                        android:background="@drawable/bg_light_pill_orange"
+                        android:textColor="@color/drifly_orange_deep"
+                        android:fontFamily="@font/plus_jakarta_sans"
+                        android:textStyle="bold"
+                        android:textSize="13sp"
+                        android:text="📍 Usar Localização GPS Atual como Casa" />
+
+                    <TextView
+                        android:id="@+id/tvHomeConfigStatus"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:text="Casa não configurada"
+                        android:textColor="@color/drifly_amber"
+                        android:fontFamily="@font/plus_jakarta_sans"
+                        android:textSize="11sp" />
+                </LinearLayout>
+
+                <!-- Lista Negra de Bairros (Bloqueio de Áreas de Risco) -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="22dp"
+                    android:text="Bairros bloqueados"
+                    android:textColor="@color/drifly_orange"
+                    android:fontFamily="@font/plus_jakarta_sans"
+                    android:textStyle="bold"
+                    android:textSize="15sp" />
+
+                <LinearLayout
+                    android:id="@+id/cardConfigBlacklist"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:background="@drawable/bg_light_card"
+                    android:padding="18dp"
+                    android:orientation="vertical">
+
+                    <Switch
+                        android:id="@+id/swBlacklistEnabled"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Ativar Lista Negra de Bairros"
+                        android:fontFamily="@font/plus_jakarta_sans"
+                        android:textColor="@color/drifly_ink" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:text="Corridas com embarque ou destino nestes bairros terão o aceite automático bloqueado e exibirão alerta vermelho de recusa."
+                        android:textColor="@color/drifly_mut"
+                        android:fontFamily="@font/plus_jakarta_sans"
+                        android:textSize="12sp" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginVertical="12dp"
+                        android:background="@color/drifly_line" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Adicionar Bairro / Região:"
+                        android:textColor="@color/drifly_mut"
+                        android:fontFamily="@font/plus_jakarta_sans"
+                        android:textSize="13sp" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <EditText
+                            android:id="@+id/etBlacklistTerm"
+                            android:layout_width="0dp"
+                            android:layout_height="48dp"
+                            android:layout_weight="1"
+                            android:background="@drawable/bg_light_field"
+                            android:paddingHorizontal="14dp"
+                            android:hint="Ex: Cidade Jardim Parauapebas"
+                            android:textColor="@color/drifly_ink"
+                            android:textColorHint="@color/drifly_mut"
+                            android:fontFamily="@font/plus_jakarta_sans"
+                            android:textSize="14sp"
+                            android:inputType="textCapWords" />
+
+                        <Button
+                            android:id="@+id/btnAddBlacklist"
+                            android:layout_width="wrap_content"
+                            android:layout_height="48dp"
+                            android:layout_marginStart="8dp"
+                            app:backgroundTint="@null"
+                            android:background="@drawable/bg_light_btn_primary"
+                            android:textColor="#FFFFFF"
+                            android:fontFamily="@font/plus_jakarta_sans"
+                            android:textStyle="bold"
+                            android:textSize="13sp"
+                            android:text="Adicionar" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/layoutBlacklistItems"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:orientation="vertical" />
+
+                    <TextView
+                        android:id="@+id/tvBlacklistEmpty"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="Nenhum bairro cadastrado na lista negra."
+                        android:textColor="@color/drifly_mut"
+                        android:fontFamily="@font/plus_jakarta_sans"
+                        android:textSize="12sp"
+                        android:gravity="center" />
+                </LinearLayout>
+
+                <Button
+                    android:id="@+id/btnSaveRideSettings"
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:layout_marginTop="22dp"
+                    app:backgroundTint="@null"
+                    android:background="@drawable/bg_light_btn_primary"
+                    android:elevation="8dp"
+                    android:outlineAmbientShadowColor="@color/drifly_orange"
+                    android:outlineSpotShadowColor="@color/drifly_orange"
+                    android:textColor="#FFFFFF"
+                    android:fontFamily="@font/plus_jakarta_sans"
+                    android:textStyle="bold"
+                    android:letterSpacing="0.03"
+                    android:textSize="15sp"
+                    android:text="Salvar Configurações de Corrida" />
+
+            </LinearLayout>
+        </ScrollView>
+
+        <FrameLayout
+            android:id="@+id/viewTabMap"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone">
+            <FrameLayout
+                android:id="@+id/mapTabContainer"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+        </FrameLayout>
+
+        <!-- ABA 3: APOIO AO PROJETO & DOAÇÕES PIX -->
+        <ScrollView
+            android:id="@+id/viewTabSupport"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fillViewport="true"
+            android:overScrollMode="never"
+            android:visibility="gone">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingHorizontal="18dp"
+                android:paddingTop="6dp"
+                android:paddingBottom="24dp">
+
+                <!-- Header Card: Coração + Título -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_light_card"
+                    android:padding="18dp"
+                    android:orientation="vertical">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <FrameLayout
+                            android:layout_width="38dp"
+                            android:layout_height="38dp"
+                            android:background="@drawable/bg_light_circle"
+                            android:padding="8dp">
+
+                            <ImageView
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:src="@drawable/ic_heart"
+                                app:tint="@color/drifly_red"
+                                android:contentDescription="Apoie o DriFly" />
+                        </FrameLayout>
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="12dp"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Apoie o DriFly"
+                                android:textColor="@color/drifly_ink"
+                                android:fontFamily="@font/plus_jakarta_sans"
+                                android:textStyle="bold"
+                                android:textSize="18sp" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Grátis nesta fase • Sem anúncios"
+                                android:textColor="@color/drifly_orange"
+                                android:fontFamily="@font/plus_jakarta_sans"
+                                android:textStyle="bold"
+                                android:textSize="11sp" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:lineSpacingExtra="3dp"
+                        android:text="O DriFly Condutor está em desenvolvimento e por enquanto é gratuito: alertas das ofertas, filtros de valor, distância e nota, meta de ganhos, mapa offline e controle de despesas.\n\nSe o app te ajuda no dia a dia, dá para apoiar o projeto com uma contribuição voluntária via Pix."
+                        android:textColor="@color/drifly_mut"
+                        android:fontFamily="@font/plus_jakarta_sans"
+                        android:textSize="13sp" />
+
+                </LinearLayout>
+
+                <!-- Card de Doação PIX -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:background="@drawable/bg_light_card"
+                    android:padding="18dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="APOIO VOLUNTÁRIO VIA PIX"
+                        android:textColor="@color/drifly_green"
+                        android:fontFamily="@font/plus_jakarta_sans"
+                        android:textStyle="bold"
+                        android:letterSpacing="0.05"
+                        android:textSize="11sp" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="Contribuição voluntária, sem contrapartida de recursos."
+                        android:textColor="@color/drifly_mut"
+                        android:fontFamily="@font/plus_jakarta_sans"
+                        android:textSize="11sp" />
+
+                    <!-- Dados do Titular e Banco -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:background="@color/drifly_line"
+                        android:padding="12dp"
+                        android:orientation="vertical">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Titular:"
+                                android:textColor="@color/drifly_mut"
+                                android:fontFamily="@font/plus_jakarta_sans"
+                                android:textSize="12sp" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="6dp"
+                                android:text="André Luiz da Silva Fontes"
+                                android:textColor="@color/drifly_ink"
+                                android:fontFamily="@font/plus_jakarta_sans"
+                                android:textStyle="bold"
+                                android:textSize="12sp" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Banco:"
+                                android:textColor="@color/drifly_mut"
+                                android:fontFamily="@font/plus_jakarta_sans"
+                                android:textSize="12sp" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="6dp"
+                                android:text="Banco Santander"
+                                android:textColor="@color/drifly_ink"
+                                android:fontFamily="@font/plus_jakarta_sans"
+                                android:textStyle="bold"
+                                android:textSize="12sp" />
+                        </LinearLayout>
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:layout_marginVertical="8dp"
+                            android:background="@color/drifly_line" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Chave Pix (Copia e Cola):"
+                            android:textColor="@color/drifly_mut"
+                            android:fontFamily="@font/plus_jakarta_sans"
+                            android:textSize="11sp" />
+
+                        <TextView
+                            android:id="@+id/tvPixKeyText"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:text="2953f386-d6e1-4ce7-8a4b-17f7237e9c32"
+                            android:textColor="@color/drifly_orange"
+                            android:fontFamily="@font/plus_jakarta_sans"
+                            android:textStyle="bold"
+                            android:textSize="13sp" />
+                    </LinearLayout>
+
+                    <!-- Botão Copiar Chave PIX -->
+                    <RelativeLayout
+                        android:id="@+id/btnCopyPixKey"
+                        android:layout_width="match_parent"
+                        android:layout_height="52dp"
+                        android:layout_marginTop="14dp"
+                        android:background="@drawable/bg_light_btn_primary"
+                        android:elevation="6dp"
+                        android:outlineAmbientShadowColor="@color/drifly_orange"
+                        android:outlineSpotShadowColor="@color/drifly_orange"
+                        android:paddingHorizontal="18dp"
+                        android:clickable="true"
+                        android:focusable="true">
+
+                        <ImageView
+                            android:id="@+id/ivCopyIcon"
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:layout_alignParentStart="true"
+                            android:layout_centerVertical="true"
+                            android:src="@drawable/ic_copy"
+                            app:tint="@color/drifly_ink"
+                            android:contentDescription="Copiar PIX" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_toEndOf="@id/ivCopyIcon"
+                            android:layout_centerVertical="true"
+                            android:layout_marginStart="12dp"
+                            android:text="Copiar Chave PIX"
+                            android:textColor="#FFFFFF"
+                            android:fontFamily="@font/plus_jakarta_sans"
+                            android:textStyle="bold"
+                            android:textSize="15sp" />
+                    </RelativeLayout>
+                </LinearLayout>
+
+                <!-- Sugestões de Valores -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:background="@drawable/bg_light_card"
+                    android:padding="18dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Valores sugeridos"
+                        android:textColor="@color/drifly_mut"
+                        android:fontFamily="@font/plus_jakarta_sans"
+                        android:textStyle="bold"
+                        android:letterSpacing="0.05"
+                        android:textSize="11sp" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:id="@+id/chipDonation5"
+                            android:layout_width="0dp"
+                            android:layout_height="42dp"
+                            android:layout_weight="1"
+                            android:background="@drawable/bg_light_chip"
+                            android:gravity="center"
+                            android:text="☕ R$ 5"
+                            android:textColor="@color/drifly_ink"
+                            android:fontFamily="@font/plus_jakarta_sans"
+                            android:textStyle="bold"
+                            android:textSize="13sp" />
+
+                        <TextView
+                            android:id="@+id/chipDonation10"
+                            android:layout_width="0dp"
+                            android:layout_height="42dp"
+                            android:layout_weight="1"
+                            android:layout_marginStart="8dp"
+                            android:background="@drawable/bg_light_chip"
+                            android:gravity="center"
+                            android:text="🥪 R$ 10"
+                            android:textColor="@color/drifly_ink"
+                            android:fontFamily="@font/plus_jakarta_sans"
+                            android:textStyle="bold"
+                            android:textSize="13sp" />
+
+                        <TextView
+                            android:id="@+id/chipDonation20"
+                            android:layout_width="0dp"
+                            android:layout_height="42dp"
+                            android:layout_weight="1"
+                            android:layout_marginStart="8dp"
+                            android:background="@drawable/bg_light_chip"
+                            android:gravity="center"
+                            android:text="⛽ R$ 20"
+                            android:textColor="@color/drifly_ink"
+                            android:fontFamily="@font/plus_jakarta_sans"
+                            android:textStyle="bold"
+                            android:textSize="13sp" />
+
+                        <TextView
+                            android:id="@+id/chipDonation50"
+                            android:layout_width="0dp"
+                            android:layout_height="42dp"
+                            android:layout_weight="1"
+                            android:layout_marginStart="8dp"
+                            android:background="@drawable/bg_light_chip"
+                            android:gravity="center"
+                            android:text="⭐ R$ 50"
+                            android:textColor="@color/drifly_ink"
+                            android:fontFamily="@font/plus_jakarta_sans"
+                            android:textStyle="bold"
+                            android:textSize="13sp" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:text="Sua contribuição mantém o plano básico gratuito e o app sem anúncios!"
+                        android:textColor="@color/drifly_mut"
+                        android:gravity="center"
+                        android:fontFamily="@font/plus_jakarta_sans"
+                        android:textSize="11sp" />
+                </LinearLayout>
+
+                <!-- Rodapé de Transparência -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:background="@color/drifly_line"
+                    android:padding="14dp"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/tvAppVersionFooter"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="DriFly v1.1.1 • Compilação Oficial"
+                        android:textColor="@color/drifly_mut"
+                        android:fontFamily="@font/plus_jakarta_sans"
+                        android:textSize="12sp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="Feito com dedicação para motoristas de todo o Brasil 🇧🇷"
+                        android:textColor="@color/drifly_mut"
+                        android:fontFamily="@font/plus_jakarta_sans"
+                        android:textSize="11sp" />
+
+                    <TextView
+                        android:id="@+id/tvPoliticaPrivacidade"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:padding="4dp"
+                        android:text="Política de Privacidade"
+                        android:textColor="@color/drifly_orange"
+                        android:fontFamily="@font/plus_jakarta_sans"
+                        android:textStyle="bold"
+                        android:textSize="12sp" />
+                </LinearLayout>
+
+            </LinearLayout>
+        </ScrollView>
+    </FrameLayout>
+
+    <!-- Divisor Sutil no Topo da Navegação Inferior -->
+    <View
+        android:id="@+id/bottomNavDivider"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_above="@id/bottomNavigation"
+        android:background="@color/drifly_line" />
+
+    <!-- Barra de Navegação Inferior com Acabamento Sofisticado -->
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottomNavigation"
+        android:layout_width="match_parent"
+        android:layout_height="68dp"
+        android:layout_alignParentBottom="true"
+        android:background="@color/drifly_card"
+        app:labelVisibilityMode="labeled"
+        app:itemIconSize="22dp"
+        app:itemPaddingTop="8dp"
+        app:itemPaddingBottom="10dp"
+        app:itemIconTint="@color/nav_item_color"
+        app:itemTextColor="@color/nav_item_color"
+        app:menu="@menu/bottom_navigation_menu" />
+
+    <!-- Camada de Abertura Cinematográfica (Toca APENAS no Cold Start, 0ms black flash) -->
+    <FrameLayout
+        android:id="@+id/layoutSplashOverlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#000000"
+        android:clickable="true"
+        android:focusable="true"
+        android:elevation="120dp"
+        android:visibility="gone">
+
+        <TextureView
+            android:id="@+id/textureSplashVideo"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center" />
+
+        <!-- Poster do Frame 0 para eliminar qualquer flash preto antes do decoder H.264 renderizar -->
+        <ImageView
+            android:id="@+id/ivSplashPoster"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"
+            android:src="@drawable/splash_first_frame"
+            android:contentDescription="@null" />
+
+        <!-- Capa de bloqueio (biometria): o poster do vídeo é preto, então mostramos
+             a marca para o motorista não achar que o app travou numa tela preta. -->
+        <ImageView
+            android:id="@+id/ivLockLogo"
+            android:layout_width="160dp"
+            android:layout_height="160dp"
+            android:layout_gravity="center"
+            android:src="@drawable/ic_drifly_marca"
+            android:contentDescription="@null"
+            android:visibility="gone" />
+    </FrameLayout>
+
+</RelativeLayout>

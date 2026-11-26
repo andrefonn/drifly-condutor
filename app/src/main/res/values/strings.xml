@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">DriFly Condutor</string>
+    <string name="accessibility_service_desc">O DriFly Condutor lê os dados da oferta de corrida que aparece na tela para mostrar o valor líquido real, já descontando combustível e custos, e para aplicar as regras de aceite e recusa que você mesmo configurou. O acesso é opcional, não é usado para ler conversas nem senhas e pode ser desativado a qualquer momento nas configurações do Android.</string>
+</resources>

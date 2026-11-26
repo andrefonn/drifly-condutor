@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Sobreposição completa de navegação Turn-by-Turn 100% offline:
+    - Topo: banner escuro de alto contraste com seta da manobra, distância, nome da rua
+      e faixa "Depois" da manobra seguinte.
+    - Base: barra compacta com ETA, tempo/km restantes, velocidade, botão de som pt-BR,
+      botão "Recentralizar" (quando o motorista arrasta o mapa) e "Encerrar".
+-->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/navOverlayRoot"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:visibility="gone">
+
+    <!-- Topo: Banner de Manobra -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top"
+        android:layout_marginHorizontal="10dp"
+        android:layout_marginTop="10dp"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:id="@+id/navManeuverBanner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_nav_banner"
+            android:elevation="10dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingHorizontal="14dp"
+            android:paddingVertical="12dp">
+
+            <FrameLayout
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@drawable/bg_map_fab_orange"
+                android:padding="10dp">
+
+                <ImageView
+                    android:id="@+id/ivNavManeuverIcon"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:contentDescription="Direção da manobra"
+                    android:src="@drawable/ic_maneuver_straight" />
+            </FrameLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/tvNavManeuverDist"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/plus_jakarta_sans"
+                        android:text="250 m"
+                        android:textColor="#FFFFFF"
+                        android:textSize="22sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tvNavSimBadge"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:background="@drawable/bg_light_pill_orange"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:paddingHorizontal="8dp"
+                        android:paddingVertical="2dp"
+                        android:text="DEMO 1x"
+                        android:textColor="@color/drifly_orange_deep"
+                        android:textSize="10.5sp"
+                        android:textStyle="bold"
+                        android:visibility="gone" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/tvNavStreetName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:maxLines="2"
+                    android:text="Rua Dr. João Colin"
+                    android:textColor="#E2E8F0"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Faixa secundária: próxima manobra ("Depois: ...") ou aviso de recálculo -->
+        <LinearLayout
+            android:id="@+id/navNextStepBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="4dp"
+            android:background="@drawable/bg_nav_banner"
+            android:elevation="6dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingHorizontal="12dp"
+            android:paddingVertical="6dp"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/tvNavNextStep"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:singleLine="true"
+                android:text="Depois: vire à esquerda na Av. Getúlio Vargas"
+                android:textColor="#CBD5E1"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Botão flutuante: Recentralizar câmera 3D (aparece se o motorista arrastar o mapa) -->
+    <TextView
+        android:id="@+id/btnNavRecenter"
+        android:layout_width="wrap_content"
+        android:layout_height="38dp"
+        android:layout_gravity="bottom|start"
+        android:layout_marginStart="12dp"
+        android:layout_marginBottom="92dp"
+        android:background="@drawable/bg_map_card"
+        android:clickable="true"
+        android:elevation="8dp"
+        android:focusable="true"
+        android:gravity="center"
+        android:paddingHorizontal="14dp"
+        android:text="Recentralizar"
+        android:textColor="@color/drifly_blue"
+        android:textSize="12.5sp"
+        android:textStyle="bold"
+        android:visibility="gone" />
+
+    <!-- Botão flutuante: Voz pt-BR (mudo / ligado) -->
+    <ImageButton
+        android:id="@+id/btnNavVoiceToggle"
+        android:layout_width="44dp"
+        android:layout_height="44dp"
+        android:layout_gravity="bottom|end"
+        android:layout_marginEnd="12dp"
+        android:layout_marginBottom="92dp"
+        android:background="@drawable/bg_light_circle"
+        android:contentDescription="Ativar ou silenciar voz"
+        android:elevation="6dp"
+        android:padding="11dp"
+        android:scaleType="fitCenter"
+        android:src="@drawable/ic_nav_sound_on" />
+
+    <!-- Base: Barra compacta de ETA, km restantes e encerrar -->
+    <LinearLayout
+        android:id="@+id/navBottomBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:layout_marginHorizontal="10dp"
+        android:layout_marginBottom="10dp"
+        android:background="@drawable/bg_map_card"
+        android:clickable="true"
+        android:elevation="12dp"
+        android:focusable="true"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingHorizontal="14dp"
+        android:paddingVertical="12dp">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tvNavRemainingTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/plus_jakarta_sans"
+                android:text="12 min"
+                android:textColor="@color/drifly_green"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvNavRemainingMeta"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="5,2 km · chegada 14:32"
+                android:textColor="@color/drifly_mut"
+                android:textSize="12.5sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/btnNavStop"
+            android:layout_width="wrap_content"
+            android:layout_height="42dp"
+            android:background="@drawable/bg_light_pill_red"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center"
+            android:paddingHorizontal="18dp"
+            android:text="Encerrar"
+            android:textColor="@color/drifly_red"
+            android:textSize="13.5sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+</FrameLayout>

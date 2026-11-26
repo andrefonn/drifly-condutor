@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Manifesto exclusivo da versão de publicação (release / Play Store).
+
+    A permissão REQUEST_INSTALL_PACKAGES faz o Google exigir justificativa e
+    costuma ser recusada em revisão. A versão da Play não precisa dela: quem
+    atualiza o app é a própria Play Store. O APK de teste (debug), que é
+    instalado por cabo, continua com a permissão e com o auto-atualizador.
+-->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <uses-permission
+        android:name="android.permission.REQUEST_INSTALL_PACKAGES"
+        tools:node="remove" />
+
+    <!--
+        O recebedor de comandos de teste (simular corrida, ligar/desligar
+        monitoramento, limpar logs, forçar modo casa) existia exportado na
+        versão de publicação: qualquer app instalado no celular poderia
+        disparar essas ações. Ele só faz sentido no APK de debug, então sai
+        do build da Play.
+    -->
+    <application>
+        <receiver
+            android:name=".RideSimulationReceiver"
+            tools:node="remove" />
+    </application>
+</manifest>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Dica de motorista: lâmpada do objeto ICO do protótipo. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#FFFFFFFF"
+        android:strokeWidth="2.2"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M9 18h6M10 21h4M12 3a6 6 0 0 0 -4 10.5c0.7 0.7 1 1.5 1 2.5h6c0 -1 0.3 -1.8 1 -2.5A6 6 0 0 0 12 3z" />
+</vector>

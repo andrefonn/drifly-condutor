@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Paleta do redesign v3 (mesma do protótipo HTML) -->
+    <color name="drifly_bg">#F3F5F9</color>
+    <color name="drifly_card">#FFFFFF</color>
+    <color name="drifly_line">#E7ECF2</color>
+    <color name="drifly_field">#F4F6FA</color>
+
+    <color name="drifly_ink">#162033</color>
+    <color name="drifly_mut">#5A6579</color>
+    <color name="drifly_icon">#334155</color>
+
+    <color name="drifly_orange">#FF6F00</color>
+    <color name="drifly_orange_2">#FF9506</color>
+    <color name="drifly_orange_deep">#B24D00</color>
+    <color name="drifly_orange_tint">#FFF3E6</color>
+
+    <color name="drifly_green">#0B8A54</color>
+    <color name="drifly_green_tint">#E6F6EE</color>
+
+    <color name="drifly_red">#D62839</color>
+    <color name="drifly_red_tint">#FDECEE</color>
+
+    <color name="drifly_amber">#A85A00</color>
+    <color name="drifly_amber_tint">#FFF4DD</color>
+    <color name="drifly_blue">#2563EB</color>
+
+    <color name="bottom_nav_indicator_color">#1AFF6F00</color>
+    <color name="drifly_nav_shadow">#0F172A</color>
+
+    <!-- Cores dos tipos de sinal colaborativo (aba Mapa).
+         Espelham os valores do objeto STYPE do protótipo e também ficam
+         disponíveis em código por SignalType.cor. -->
+    <color name="signal_banheiro">#2563EB</color>
+    <color name="signal_agua">#0891B2</color>
+    <color name="signal_perigo">#D62839</color>
+    <color name="signal_descanso">#0B8A54</color>
+    <color name="signal_almoco">#7C3AED</color>
+    <color name="signal_posto">#DB2777</color>
+    <color name="signal_mecanico">#475569</color>
+    <color name="signal_lanche">#B45309</color>
+    <color name="signal_borracharia">#4D7C0F</color>
+    <color name="signal_dica">#CA8A04</color>
+    <color name="signal_evento">#FF6F00</color>
+    <color name="ic_launcher_background">#212121</color>
+</resources>

@@ -1,0 +1,314 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Painel "Sinalizar no mapa" (.mb + .sheet do protótipo).
+    O scrim cobre o mapa e o sheet sobe de baixo. As abas Lugar / Dica / Paga+
+    trocam os painéis abaixo (lógica em MapFragment).
+-->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/editorScrim"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_map_scrim"
+    android:clickable="true"
+    android:elevation="30dp"
+    android:focusable="true"
+    android:visibility="gone">
+
+    <ScrollView
+        android:id="@+id/editorSheet"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:background="@drawable/bg_map_panel"
+        android:clipToOutline="true"
+        android:elevation="32dp"
+        android:fillViewport="false"
+        android:overScrollMode="never">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            android:focusable="true"
+            android:orientation="vertical"
+            android:paddingHorizontal="18dp"
+            android:paddingTop="18dp"
+            android:paddingBottom="26dp">
+
+            <!-- Título do painel -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:maxLines="1"
+                    android:singleLine="true"
+                    android:text="Sinalizar no mapa"
+                    android:textColor="@color/drifly_ink"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/editorClose"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:background="@drawable/bg_light_circle"
+                    android:contentDescription="Fechar"
+                    android:gravity="center"
+                    android:text="×"
+                    android:textColor="@color/drifly_mut"
+                    android:textSize="18sp" />
+            </LinearLayout>
+
+            <!-- Abas Lugar / Dica / Paga+ (.seg) -->
+            <LinearLayout
+                android:id="@+id/editorTabs"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/editorTabLugar"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="6dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_map_chip_on"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:gravity="center"
+                    android:maxLines="1"
+                    android:paddingVertical="8dp"
+                    android:singleLine="true"
+                    android:text="Lugar"
+                    android:textColor="@color/drifly_card"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/editorTabDica"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="6dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_map_chip"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:gravity="center"
+                    android:maxLines="1"
+                    android:paddingVertical="8dp"
+                    android:singleLine="true"
+                    android:text="Dica"
+                    android:textColor="@color/drifly_mut"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/editorTabEvento"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_map_chip"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:gravity="center"
+                    android:maxLines="1"
+                    android:paddingVertical="8dp"
+                    android:singleLine="true"
+                    android:text="Paga+"
+                    android:textColor="@color/drifly_mut"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <!-- Aba LUGAR: grade 2 colunas com os 9 lugares -->
+            <LinearLayout
+                android:id="@+id/editorPlacePanel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:id="@+id/editorPlaces"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:lineSpacingExtra="2dp"
+                    android:text="O sinal nasce na sua posição e só aparece para todos depois que outros motoristas confirmarem."
+                    android:textColor="@color/drifly_mut"
+                    android:textSize="12sp" />
+
+                <TextView
+                    android:id="@+id/editorSendPlace"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:layout_marginTop="12dp"
+                    android:background="@drawable/bg_btn_primary_gradient"
+                    android:clickable="true"
+                    android:elevation="6dp"
+                    android:focusable="true"
+                    android:gravity="center"
+                    android:maxLines="1"
+                    android:singleLine="true"
+                    android:text="Enviar sinal"
+                    android:textColor="@color/drifly_card"
+                    android:textSize="14.5sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <!-- Aba DICA: texto livre com moderação -->
+            <LinearLayout
+                android:id="@+id/editorTipPanel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="6dp"
+                    android:text="Sua dica para outros motoristas"
+                    android:textColor="@color/drifly_mut"
+                    android:textSize="12.5sp"
+                    android:textStyle="bold" />
+
+                <EditText
+                    android:id="@+id/editorTipText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_light_field"
+                    android:gravity="top|start"
+                    android:hint="Ex.: entrada lateral é mais rápida para embarque"
+                    android:importantForAutofill="no"
+                    android:inputType="textMultiLine|textCapSentences"
+                    android:maxLines="3"
+                    android:minHeight="84dp"
+                    android:padding="12dp"
+                    android:textColor="@color/drifly_ink"
+                    android:textColorHint="@color/drifly_mut"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/editorTipCount"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:gravity="end"
+                    android:maxLines="1"
+                    android:singleLine="true"
+                    android:text="0/80"
+                    android:textColor="@color/drifly_mut"
+                    android:textSize="11.5sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/editorTipError"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:minHeight="18dp"
+                    android:textColor="@color/drifly_red"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:visibility="gone" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="12dp"
+                    android:lineSpacingExtra="2dp"
+                    android:text="Sem palavrões, links ou telefones. Quem passar por perto vota Verdade ou Mentira, e a maioria decide se a dica fica."
+                    android:textColor="@color/drifly_mut"
+                    android:textSize="12sp" />
+
+                <TextView
+                    android:id="@+id/editorSendTip"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:background="@drawable/bg_btn_primary_gradient"
+                    android:clickable="true"
+                    android:elevation="6dp"
+                    android:focusable="true"
+                    android:gravity="center"
+                    android:maxLines="1"
+                    android:singleLine="true"
+                    android:text="Enviar dica"
+                    android:textColor="@color/drifly_card"
+                    android:textSize="14.5sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <!-- Aba PAGA+: evento de alta demanda -->
+            <LinearLayout
+                android:id="@+id/editorEventPanel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    android:text="O que está acontecendo?"
+                    android:textColor="@color/drifly_mut"
+                    android:textSize="12.5sp"
+                    android:textStyle="bold" />
+
+                <LinearLayout
+                    android:id="@+id/editorEventRow1"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="6dp"
+                    android:orientation="horizontal" />
+
+                <LinearLayout
+                    android:id="@+id/editorEventRow2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="12dp"
+                    android:lineSpacingExtra="2dp"
+                    android:text="Marca uma área com muita demanda na sua posição por 2 horas. Precisa da confirmação de outros motoristas na região."
+                    android:textColor="@color/drifly_mut"
+                    android:textSize="12sp" />
+
+                <TextView
+                    android:id="@+id/editorSendEvent"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:background="@drawable/bg_btn_primary_gradient"
+                    android:clickable="true"
+                    android:elevation="6dp"
+                    android:focusable="true"
+                    android:gravity="center"
+                    android:maxLines="1"
+                    android:singleLine="true"
+                    android:text="Enviar evento Paga+"
+                    android:textColor="@color/drifly_card"
+                    android:textSize="14.5sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+</FrameLayout>

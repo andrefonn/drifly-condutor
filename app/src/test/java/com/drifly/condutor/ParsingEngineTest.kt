@@ -1,0 +1,1331 @@
+package com.drifly.condutor
+
+import org.junit.Assert.*
+import org.junit.Test
+
+class ParsingEngineTest {
+
+    @Test
+    fun testParseValidUberOffer() {
+        val texts = listOf(
+            "UberX",
+            "R$ 32,50",
+            "8,4 km",
+            "19 min",
+            "★ 4.88"
+        )
+        val offer = ParsingEngine.parseNodes(
+            packageName = "com.ubercab.driver",
+            texts = texts,
+            costPerKm = 0.78,
+            minRatingThreshold = 4.75f
+        )
+
+        assertNotNull("Offer should not be null", offer)
+        assertEquals("UBER", offer!!.platform)
+        assertEquals(32.50, offer.price, 0.001)
+        assertEquals(8.4, offer.distanceKm, 0.001)
+        assertEquals(19, offer.durationMinutes)
+        assertEquals(3.87, offer.ratePerKm, 0.01)
+        assertEquals(6.55, offer.estimatedFuelCost, 0.01)
+        assertEquals(25.95, offer.netProfit, 0.01)
+        assertEquals(4.88f, offer.passengerRating ?: 0f, 0.01f)
+        assertFalse(offer.isLowRating)
+        assertEquals(102.63, offer.ratePerHour, 0.01)
+    }
+
+    @Test
+    fun testParseLowRatingTriggersAlert() {
+        val texts = listOf(
+            "99Pop",
+            "R$ 20,00",
+            "5.0 km",
+            "12 min",
+            "4.60"
+        )
+        val offer = ParsingEngine.parseNodes(
+            packageName = "com.app99.driver",
+            texts = texts,
+            costPerKm = 0.80,
+            minRatingThreshold = 4.75f
+        )
+
+        assertNotNull(offer)
+        assertEquals("99", offer!!.platform)
+        assertEquals(4.60f, offer.passengerRating ?: 0f, 0.01f)
+        assertTrue("Rating 4.60 should be marked as low rating when threshold is 4.75", offer.isLowRating)
+    }
+
+    @Test
+    fun testParseZeroOrNegativeDistanceReturnsNull() {
+        val texts = listOf("R$ 15,00", "0 km")
+        val offer = ParsingEngine.parseNodes(
+            packageName = "com.ubercab.driver",
+            texts = texts,
+            costPerKm = 0.80,
+            minRatingThreshold = 4.70f
+        )
+        assertNull("Zero distance should return null offer", offer)
+    }
+
+    @Test
+    fun testParseEmptyTextsReturnsNull() {
+        val offer = ParsingEngine.parseNodes(
+            packageName = "com.ubercab.driver",
+            texts = emptyList(),
+            costPerKm = 0.80,
+            minRatingThreshold = 4.70f
+        )
+        assertNull("Empty list should return null offer", offer)
+    }
+
+    @Test
+    fun testParseRealUberMotoCardComTotalETrechos() {
+        // Texto REAL da tela da Uber Motorista (21:15 de 06/11/2026)
+        val texts = listOf(
+            "Moto",
+            "Exclusivo",
+            "R$5,73",
+            "12min • 4.1km • Est. de R$1,40/km",
+            "5,00 (17)",
+            "6 min (1.8km)",
+            "R. Adolfo Soares, Itinga, Joinville",
+            "6 minutos (2.3km)",
+            "Rua Estados Unidos, 75, Araquari, Araquari",
+            "Aceitar"
+        )
+        val offer = ParsingEngine.parseNodes(
+            packageName = "com.ubercab.driver",
+            texts = texts,
+            costPerKm = 0.2148,
+            minRatingThreshold = 4.75f
+        )
+
+        assertNotNull("Card real da Uber deve gerar oferta", offer)
+        assertEquals("UBER", offer!!.platform)
+        assertEquals(5.73, offer.price, 0.001)
+        assertEquals(4.1, offer.distanceKm, 0.01)
+        assertEquals(12, offer.durationMinutes)
+        assertEquals(1.40, offer.ratePerKm, 0.01)
+        // A fachada deve apontar para o DESTINO (último endereço do card), não para o embarque
+        assertEquals("Rua Estados Unidos, 75, Araquari, Araquari", offer.destinationAddress)
+        // Trechos detalhados para a notificação de análise completa
+        assertEquals(1.8, offer.pickupDistanceKm ?: 0.0, 0.01)
+        assertEquals(2.3, offer.tripDistanceKm ?: 0.0, 0.01)
+        assertEquals(6, offer.pickupDurationMinutes)
+        assertEquals(6, offer.tripDurationMinutes)
+    }
+
+    @Test
+    fun testParseTrechosComMinutosSemTotalExplicito() {
+        // "minutos" por extenso também precisa contar como trecho (a Uber usa os dois formatos)
+        val texts = listOf(
+            "UberX",
+            "R$ 20,00",
+            "6 min (1.8km)",
+            "6 minutos (2.3km)",
+            "Aceitar"
+        )
+        val offer = ParsingEngine.parseNodes(
+            packageName = "com.ubercab.driver",
+            texts = texts,
+            costPerKm = 0.2148,
+            minRatingThreshold = 4.75f
+        )
+        assertNotNull(offer)
+        assertEquals(4.1, offer!!.distanceKm, 0.01)
+        assertEquals(12, offer.durationMinutes)
+    }
+
+    @Test
+    fun testBannerPromocionalNaoViraCorrida() {
+        // Texto REAL lido por OCR do banner "Você ganhou R$38,2 com o pacote 0% de."
+        // A barra de status ("19:33 M") era interpretada como "33 metros" e gerava uma oferta falsa.
+        val texts = listOf(
+            "19:33 M 99",
+            "Taxa",
+            "% 0% de Taxa 13:23:30",
+            "Ver",
+            "ITÌNGA",
+            "Você ganhou R$38,2 com o pacote 0% de",
+            "9A060%",
+            "Conectar",
+            "%",
+            "A"
+        )
+        val offer = ParsingEngine.parseNodes(
+            packageName = "com.app99.driver",
+            texts = texts,
+            costPerKm = 0.2148,
+            minRatingThreshold = 4.75f
+        )
+        assertNull("Banner promocional não pode virar oferta de corrida", offer)
+    }
+
+    @Test
+    fun testRelogioDaBarraDeStatusNaoViraDistancia() {
+        val texts = listOf("19:42 M 99", "R$ 12,50", "Taxa", "Conectar")
+        val offer = ParsingEngine.parseNodes(
+            packageName = "com.app99.driver",
+            texts = texts,
+            costPerKm = 0.2148,
+            minRatingThreshold = 4.75f
+        )
+        assertNull("Horário da barra de status não pode ser lido como metros", offer)
+    }
+
+    @Test
+    fun testDistanciaIrrisoriaNaoViraOferta() {
+        val texts = listOf("R$ 9,00", "0,03 km", "Aceitar")
+        val offer = ParsingEngine.parseNodes(
+            packageName = "com.app99.driver",
+            texts = texts,
+            costPerKm = 0.2148,
+            minRatingThreshold = 4.75f
+        )
+        assertNull("Distância residual de 30 metros não pode virar oferta", offer)
+    }
+
+    @Test
+    fun testParse99MotoRealCardWithTwoLegsInMinutesFormat() {
+        // Texto REAL capturado por OCR da tela da 99 (card 99Moto, 06/11/2026 19:02)
+        // Formato dos trechos: "7 min (1,8 km)" = embarque e "2 min (1 km)" = viagem, sem rótulo textual.
+        val texts = listOf(
+            "Moto",
+            "R$5,10",
+            "0% de Taxa99 semanal",
+            "R$1,38 Tarifa base dinâmica incl.",
+            "4,91- 581 corridas",
+            "7 min (1,8 km)",
+            "ponto final do ônibus Itinga, Itinga",
+            "2 min (1 km)",
+            "CPF e Cartão verif.",
+            "Itinga",
+            "Carine cílios e sobrancelhas, Rua São João, 62 -",
+            "Aceitar"
+        )
+        val offer = ParsingEngine.parseNodes(
+            packageName = "com.app99.driver",
+            texts = texts,
+            costPerKm = 0.2148,
+            minRatingThreshold = 4.75f
+        )
+
+        assertNotNull("Card real da 99Moto deve gerar oferta", offer)
+        assertEquals("99", offer!!.platform)
+        assertEquals(5.10, offer.price, 0.001)
+        // Embarque (1,8 km) + viagem (1,0 km) = 2,8 km percorridos no total
+        assertEquals(2.8, offer.distanceKm, 0.01)
+        // 7 min de embarque + 2 min de viagem = 9 min
+        assertEquals(9, offer.durationMinutes)
+        // R$/km real = 5,10 / 2,8 = 1,82 (e não 2,83 usando só o embarque)
+        assertEquals(1.82, offer.ratePerKm, 0.01)
+        // Trechos detalhados preservados para a notificação
+        assertEquals(1.8, offer.pickupDistanceKm ?: 0.0, 0.01)
+        assertEquals(1.0, offer.tripDistanceKm ?: 0.0, 0.01)
+        assertEquals(7, offer.pickupDurationMinutes)
+        assertEquals(2, offer.tripDurationMinutes)
+    }
+
+    @Test
+    fun testParse99OfferWithSplitCurrencyAndNumber() {
+        // Simula a árvore de nós real da 99 onde R$, valor, número e km são TextViews separados
+        val texts = listOf(
+            "99Pop",
+            "R$",
+            "18,90",
+            "5,2",
+            "km",
+            "14",
+            "min",
+            "4.82"
+        )
+        val offer = ParsingEngine.parseNodes(
+            packageName = "com.app99.driver",
+            texts = texts,
+            costPerKm = 0.80,
+            minRatingThreshold = 4.75f
+        )
+        assertNotNull("Offer with split nodes must be parsed successfully", offer)
+        assertEquals("99", offer!!.platform)
+        assertEquals(18.90, offer.price, 0.001)
+        assertEquals(5.2, offer.distanceKm, 0.001)
+        assertEquals(14, offer.durationMinutes)
+        assertEquals(4.82f, offer.passengerRating ?: 0f, 0.01f)
+    }
+
+    @Test
+    fun testParse99OfferWithComTaxis99Package() {
+        val texts = listOf("99Moto", "R$ 12,50", "3,5 km", "8 min")
+        val offer = ParsingEngine.parseNodes(
+            packageName = "com.taxis99",
+            texts = texts,
+            costPerKm = 0.50,
+            minRatingThreshold = 4.75f
+        )
+        assertNotNull(offer)
+        assertEquals("99", offer!!.platform)
+        assertEquals(12.50, offer.price, 0.001)
+        assertEquals(3.5, offer.distanceKm, 0.001)
+    }
+
+    @Test
+    fun testParsePriceWithDotDecimal() {
+        val texts = listOf("99Pop", "R$ 15.50", "4.0 km", "10 min")
+        val offer = ParsingEngine.parseNodes(
+            packageName = "com.app99.driver",
+            texts = texts,
+            costPerKm = 0.80,
+            minRatingThreshold = 4.75f
+        )
+        assertNotNull(offer)
+        assertEquals(15.50, offer!!.price, 0.001) // Não deve virar 1550.0!
+    }
+
+    @Test
+    fun testParseDistanceInMeters() {
+        val texts = listOf("99Entrega", "R$ 8,00", "800 m", "5 min")
+        val offer = ParsingEngine.parseNodes(
+            packageName = "com.app99.driver",
+            texts = texts,
+            costPerKm = 0.80,
+            minRatingThreshold = 4.75f
+        )
+        assertNotNull(offer)
+        assertEquals(8.00, offer!!.price, 0.001)
+        assertEquals(0.8, offer.distanceKm, 0.001) // 800 m = 0.8 km
+    }
+
+    @Test
+    fun testParse99OfferWithPickupAndTripDistances() {
+        // Na 99 aparecem a distância de embarque e a de viagem
+        val texts = listOf(
+            "99Pop",
+            "R$ 22,00",
+            "1,2 km até o passageiro",
+            "5,8 km de viagem",
+            "20 min"
+        )
+        val offer = ParsingEngine.parseNodes(
+            packageName = "com.app99.driver",
+            texts = texts,
+            costPerKm = 0.80,
+            minRatingThreshold = 4.75f
+        )
+        assertNotNull(offer)
+        assertEquals(22.00, offer!!.price, 0.001)
+        // A distância total considerada para o custo real deve ser a soma (1.2 + 5.8 = 7.0) ou pelo menos a distância da viagem se discriminada
+        assertEquals(7.0, offer.distanceKm, 0.01)
+        assertEquals(1.2, offer.pickupDistanceKm ?: 0.0, 0.01)
+        assertEquals(5.8, offer.tripDistanceKm ?: 0.0, 0.01)
+    }
+
+    @Test
+    fun testParse99NotificationFormat() {
+        val texts = listOf(
+            "99 Motorista",
+            "Nova corrida: 99Pop - R$ 19,50 • 6,2 km • 15 min",
+            "Toque para ver os detalhes da corrida"
+        )
+        val offer = ParsingEngine.parseNodes(
+            packageName = "com.app99.driver",
+            texts = texts,
+            costPerKm = 0.38,
+            minRatingThreshold = 4.75f
+        )
+        assertNotNull("Offer from notification string must be parsed", offer)
+        assertEquals("99", offer!!.platform)
+        assertEquals(19.50, offer.price, 0.001)
+        assertEquals(6.2, offer.distanceKm, 0.001)
+        assertEquals(15, offer.durationMinutes)
+        assertEquals(3.15, offer.ratePerKm, 0.01)
+    }
+
+    @Test
+    fun testParseUberNotificationFormat() {
+        val texts = listOf(
+            "Uber Driver",
+            "UberX: R$ 28,90 - 7.5 km (18 min)"
+        )
+        val offer = ParsingEngine.parseNodes(
+            packageName = "com.ubercab.driver",
+            texts = texts,
+            costPerKm = 0.50,
+            minRatingThreshold = 4.75f
+        )
+        assertNotNull(offer)
+        assertEquals("UBER", offer!!.platform)
+        assertEquals(28.90, offer.price, 0.001)
+        assertEquals(7.5, offer.distanceKm, 0.001)
+        assertEquals(18, offer.durationMinutes)
+    }
+
+    @Test
+    fun testParseOfferWithDestinationAddress() {
+        val texts = listOf(
+            "UberX",
+            "R$ 25,00",
+            "6,0 km",
+            "15 min",
+            "Desembarque em:",
+            "Av. Paulista, 1578 - Bela Vista"
+        )
+        val offer = ParsingEngine.parseNodes(
+            packageName = "com.ubercab.driver",
+            texts = texts,
+            costPerKm = 0.80,
+            minRatingThreshold = 4.75f
+        )
+        assertNotNull(offer)
+        assertEquals("Av. Paulista, 1578 - Bela Vista", offer!!.destinationAddress)
+        assertEquals(100.0, offer.ratePerHour, 0.01)
+    }
+
+    @Test
+    fun testRejectSelfOverlayOrRatePerKmAsGrossPrice() {
+        // Reproduz o bug exato do vídeo do usuário:
+        // Quando a corrida de R$ 5,10 (3,2 km -> R$ 1,59/km) some após recusar,
+        // ou o texto R$ 1,59 / km aparece na tela ou no próprio overlay DriFly,
+        // o parser NÃO PODE achar que R$ 1,59 é uma nova corrida bruta de R$ 1,59!
+        val textsWithRateAndDistance = listOf(
+            "Recusar ❌",
+            "UBER",
+            "3,2 km",
+            "7 min",
+            "R$ / KM",
+            "R$ 1,59",
+            "R$ / HORA",
+            "R$ 44",
+            "★ NOTA",
+            "4,94",
+            "LUCRO REAL",
+            "R$ 4,40"
+        )
+        val offerFromSelfOverlay = ParsingEngine.parseNodes(
+            packageName = "com.ubercab.driver",
+            texts = textsWithRateAndDistance,
+            costPerKm = 0.22,
+            minRatingThreshold = 4.75f
+        )
+        assertNull("Self-overlay texts or sub-minimum prices (R$ 1,59) must NEVER be parsed as a ride offer", offerFromSelfOverlay)
+
+        // Mesmo que venha só "R$ 1,59 (por km)" e "3,2 km" da tela da Uber ao fechar o card:
+        val textsResidualUber = listOf(
+            "R$ 1,59",
+            "(por km)",
+            "3,2 km",
+            "7 min",
+            "4.94",
+            "Rua das Flores, 123"
+        )
+        val residualOffer = ParsingEngine.parseNodes(
+            packageName = "com.ubercab.driver",
+            texts = textsResidualUber,
+            costPerKm = 0.22,
+            minRatingThreshold = 4.75f
+        )
+        assertNull("Price R$ 1,59 below minimum ride fare (R$ 4.00) must be rejected", residualOffer)
+    }
+
+    @Test
+    fun testRejectActiveRideAndNavigationScreens() {
+        // Reproduz o bug onde o motorista ACEITA a corrida e durante a viagem/navegação
+        // ficam aparecendo inúmeros overlays zerados ou negativos (ex: R$ 0,00 no painel,
+        // nota 5.00 do passageiro e distância de navegação 200 m / 3,2 km).
+        val activeNavigationTexts = listOf(
+            "Vire à direita na Av. Brasil",
+            "300 m",
+            "3,2 km",
+            "8 min",
+            "R$ 0,00",
+            "5.00",
+            "Iniciar viagem",
+            "Deslize para finalizar"
+        )
+        val navOffer = ParsingEngine.parseNodes(
+            packageName = "com.ubercab.driver",
+            texts = activeNavigationTexts,
+            costPerKm = 0.30,
+            minRatingThreshold = 4.75f
+        )
+        assertNull("Active navigation screen must NEVER trigger an offer overlay", navOffer)
+
+        // Mesmo que na tela de navegação apareça algum saldo/promoção > R$ 4,00, se tiver indicadores de corrida em andamento, deve rejeitar:
+        val ongoingRideWithBalanceTexts = listOf(
+            "Em viagem com João",
+            "5.00",
+            "R$ 12,50",
+            "2,4 km",
+            "6 min",
+            "Deslize para concluir"
+        )
+        val ongoingOffer = ParsingEngine.parseNodes(
+            packageName = "com.app99.driver",
+            texts = ongoingRideWithBalanceTexts,
+            costPerKm = 0.30,
+            minRatingThreshold = 4.75f
+        )
+        assertNull("Screen with active trip indicators ('Em viagem', 'Deslize para concluir') must return null", ongoingOffer)
+    }
+
+    @Test
+    fun testDetectAcceptAndDeclineActions() {
+        assertTrue(ParsingEngine.isAcceptActionText("Aceitar"))
+        assertTrue(ParsingEngine.isAcceptActionText("Toque para aceitar"))
+        assertTrue(ParsingEngine.isAcceptActionText("Corresponder"))
+        assertFalse(ParsingEngine.isAcceptActionText("Recusar"))
+
+        assertTrue(ParsingEngine.isDeclineActionText("Recusar"))
+        assertTrue(ParsingEngine.isDeclineActionText("Rejeitar"))
+        assertTrue(ParsingEngine.isDeclineActionText("X"))
+        assertFalse(ParsingEngine.isDeclineActionText("Aceitar"))
+    }
+
+    @Test
+    fun testParseBrDecimalInputWithCommaAndDot() {
+        // Reproduz o bug onde o usuário digita "1,90" ou "1.90" nas configurações de Corridas
+        assertEquals(1.90f, ParsingEngine.parseFlexibleFloat("1,90", 0f), 0.001f)
+        assertEquals(1.90f, ParsingEngine.parseFlexibleFloat("1.90", 0f), 0.001f)
+        assertEquals(1.80f, ParsingEngine.parseFlexibleFloat("1,80", 0f), 0.001f)
+        assertEquals(150.0f, ParsingEngine.parseFlexibleFloat("150,00", 0f), 0.001f)
+        assertEquals(1250.50f, ParsingEngine.parseFlexibleFloat("1.250,50", 0f), 0.001f)
+    }
+
+    @Test
+    fun testUberActivePickupAndDropoffScreensNeverTriggerFalseOverlays() {
+        // Capturas reais do drifly_diag.log.old após aceitar corrida (Yondri e Denise)
+        val pickupYondri = listOf(
+            "Página inicial", "R$ 16,12", "Pesquisar locais", "60", "LIMITE",
+            "Recursos de segurança", "Rua Expedicionário Holz", "0.7 km", "Rua Conselheiro Arp",
+            "Está tudo pronto para você ficar online", "Preferências", "3 min", "1,4 km",
+            "Encontro com Yondri", "Recomendado para você", "Conteúdo", "Registro de viagens"
+        )
+        val dropoffYondri = listOf(
+            "Página inicial", "R$ 16,12", "Pesquisar locais", "30", "LIMITE",
+            "Recursos de segurança", "Rua Vinte e Cinco de Julho", "150 m", "Rua Orestes Guimarães",
+            "Está tudo pronto para você ficar online", "Preferências", "2 min", "0,4 km",
+            "Destino de Yondri", "Recomendado para você", "Conteúdo", "Registro de viagens"
+        )
+        val pickupDeniseDrawer = listOf(
+            "Está tudo pronto para você ficar online", "3 min", "1,6 km", "Agenda de viagens",
+            "Conteúdo", "Registro de viagens", "Preferências", "Interromper novas solicitações",
+            "Pesquisar", "Página inicial", "R$ 22,13", "Pesquisar locais", "30", "LIMITE",
+            "Recursos de segurança", "Rua dos Ginásticos", "250 m", "Rua Doutor João Colin"
+        )
+        val pickupDeniseBanner = listOf(
+            "Página inicial", "R$ 22,13", "HOJE", "Pesquisar locais", "30", "LIMITE",
+            "Recursos de segurança", "Rua dos Ginásticos", "Embarque em Rua Germano Stein",
+            "Perto de Drogaria Catarinense, R. Germano Stein, 249 - America, Joinville - SC, 89204-090",
+            "Está tudo pronto para você ficar online", "Preferências", "3 min", "1,5 km",
+            "Encontro com Denise", "Agenda de viagens", "Conteúdo", "Registro de viagens"
+        )
+
+        for (screen in listOf(pickupYondri, dropoffYondri, pickupDeniseDrawer, pickupDeniseBanner)) {
+            assertTrue(
+                "Tela de corrida ativa da Uber deve ser reconhecida como ativa: ${screen.joinToString(" | ")}",
+                ParsingEngine.isActiveRideOrNavigationScreen(screen)
+            )
+            assertNull(
+                "Tela de corrida ativa da Uber NUNCA deve gerar oferta falsa com o saldo do topo",
+                ParsingEngine.parseNodes("com.ubercab.driver", screen, 0.2148, 4.75f)
+            )
+        }
+    }
+
+    @Test
+    fun testUberOfferCardOverMapHeaderIgnoresDailyEarningsPill() {
+        // Captura real (10:55:44.350) onde o card "Moto | R$ 9,02" aparece com o topo do mapa "Página inicial | R$ 22,13 | HOJE" ainda na árvore
+        val texts = listOf(
+            "Página inicial", "R$ 22,13", "HOJE", "Pesquisar locais", "Recursos de segurança",
+            "Está tudo pronto para você ficar online", "Preferências", "Você está online",
+            "Recomendado para você", "Conteúdo", "O passe de 24 horas está ativo",
+            "Expira em 11 de nov., 09:26", "Hoje, mais tarde", "Veja as próximas promoções",
+            "Ver tempo ao volante", "Registro de viagens", "1-8 min",
+            "Moto", "R$ 9,02", "16 min • 6.7 km • Est. de R$1,35/km", "4,97 (500+)",
+            "Verificado", "4 min (1.6 km)", "Rua Orestes Guimarães, 728, América, Joinville",
+            "12 minutos (5.1 km)", "Rua Xanxerê, 23, Saguaçu, Joinville", "Aceitar"
+        )
+
+        val offer = ParsingEngine.parseNodes(
+            packageName = "com.ubercab.driver",
+            texts = texts,
+            costPerKm = 0.2148,
+            minRatingThreshold = 4.75f
+        )
+
+        assertNotNull("Deve extrair a oferta real mesmo com o cabeçalho do mapa visível", offer)
+        assertEquals(9.02, offer!!.price, 0.001)
+        assertEquals(6.7, offer.distanceKm, 0.01)
+        assertEquals(16, offer.durationMinutes)
+    }
+
+    @Test
+    fun testUberIdleScreenWithBusyAreaGuidanceIsNeitherActiveRideNorOffer() {
+        // Captura real (11:05:57.768): motorista online procurando viagens com "A caminho de uma região movimentada"
+        val idleBusyAreaTexts = listOf(
+            "Página inicial", "R$ 22,13", "Pesquisar locais", "80", "LIMITE",
+            "Recursos de segurança", "Radar de Viagens", "350 m", "Rua Dona Francisca",
+            "Está tudo pronto para você ficar online", "Preferências", "13 min", "6,6 km",
+            "Procurando viagens", "Recomendado para você", "Conteúdo",
+            "O passe de 24 horas está ativo", "Expira em 11 de nov., 09:26",
+            "A caminho de uma região movimentada", "Disponível para todas as viagens"
+        )
+
+        assertFalse(
+            "Tela ociosa 'Procurando viagens' com 'A caminho de uma região movimentada' NÃO é corrida ativa",
+            ParsingEngine.isActiveRideOrNavigationScreen(idleBusyAreaTexts)
+        )
+        assertNull(
+            "Tela ociosa do mapa com saldo R$ 22,13 NÃO pode virar oferta de corrida",
+            ParsingEngine.parseNodes("com.ubercab.driver", idleBusyAreaTexts, 0.2148, 4.75f)
+        )
+    }
+
+    @Test
+    fun test99ActivePickupAndInTripOcrScreensNeverTriggerFalseOverlays() {
+        // Simula o OCR periódico (a cada 5s) na 99 após aceitar uma corrida:
+        // O motorista está indo buscar o passageiro ou em viagem, sem "Vire à direita" no momento,
+        // mas com botões/textos da corrida ativa da 99 e valor/distância visíveis no mapa.
+        val pickup99Ocr = listOf(
+            "09:42", "R$ 14,80", "350 m", "Rua XV de Novembro",
+            "4 min • 1,3 km", "Ponto de encontro", "Cheguei", "Ligar", "Cancelar corrida"
+        )
+        val inTrip99Ocr = listOf(
+            "09:48", "R$ 14,80", "1,8 km", "Av. Getúlio Vargas",
+            "Passageiro a bordo", "A caminho do destino", "Segurança"
+        )
+
+        for (screen in listOf(pickup99Ocr, inTrip99Ocr)) {
+            assertTrue(
+                "Tela de corrida ativa da 99 lida via OCR deve ser reconhecida como ativa: ${screen.joinToString(" | ")}",
+                ParsingEngine.isActiveRideOrNavigationScreen(screen)
+            )
+            assertNull(
+                "Tela de corrida ativa da 99 NUNCA deve disparar novo overlay durante o trajeto",
+                ParsingEngine.parseNodes("com.taxis99", screen, 0.2148, 4.75f)
+            )
+        }
+    }
+
+    @Test
+    fun testOcrMapScreenOfflineOrIdleWithBalanceAndDistanceNeverTriggersOffer() {
+        // No OCR da tela de mapa (99 ou Uber), o ícone "Página inicial" não aparece como texto,
+        // mas o saldo "R$ 22,13" e alguma distância do mapa ("1,2 km") podem aparecer junto com "Conectar" / "Você está offline" / "Você está online".
+        val uberOfflineOcrWithDistance = listOf(
+            "11:16", "Joinville", "R$ 22,13", "Estádio Arena", "1,2 km",
+            "COMEÇAR", "Agenda de viagens", "Você está offline"
+        )
+        val app99IdleOcrWithDistance = listOf(
+            "11:20", "Taxa", "0% de Taxa", "R$ 34,50", "Zona de alta demanda a 1,4 km",
+            "Conectar", "Preferências"
+        )
+
+        assertFalse(
+            "Tela offline com 'Agenda de viagens' NÃO pode ser marcada como corrida ativa",
+            ParsingEngine.isActiveRideOrNavigationScreen(uberOfflineOcrWithDistance)
+        )
+        assertNull(
+            "OCR do mapa offline da Uber com R$ 22,13 e distância não pode virar oferta",
+            ParsingEngine.parseNodes("com.ubercab.driver", uberOfflineOcrWithDistance, 0.2148, 4.75f)
+        )
+        assertNull(
+            "OCR do mapa ocioso da 99 com saldo R$ 34,50 e distância não pode virar oferta",
+            ParsingEngine.parseNodes("com.taxis99", app99IdleOcrWithDistance, 0.2148, 4.75f)
+        )
+    }
+
+    @Test
+    fun testPainelDeGanhos99NaoViraOferta() {
+        val texts = listOf("R$45,93", "6 Solicitações", "Último R$5,10", "Recompensas", "Ganhos desta semana R$155,79", "3,1 km")
+        val offer = ParsingEngine.parseNodes("com.app99.driver", texts, 0.78, 4.75f)
+        assertNull("Painel/pílula de ganhos não é oferta", offer)
+    }
+
+    @Test
+    fun testDriflyMainActivityOcrNeverTriggersSelfCaptureOffer() {
+        // Captura REAL do diag.log (18:53:49.792) quando o usuário abriu o DriFly sobre a 99:
+        // antes, gerava oferta falsa de R$ 150,00 / 236,5 km com destino "r Meta".
+        val driflyMainTexts = listOf(
+            "18:53 M 99",
+            "DriFly",
+            "Painel de Resultados",
+            "PROGRESSO DASUA META",
+            "Meta: R$ 150,00 (Atingido: R$ 368,1| - 100%)",
+            "G FATURAMENTO",
+            "R$ 377,40",
+            "+ Lançar Despesa",
+            "G Histórico de Corridas",
+            "Diária",
+            "w Ajustar Meta de Ganhos",
+            "Valor Alvo (R$):",
+            "150,00",
+            "R$ O,00",
+            "DESPESAS",
+            "Semanal",
+            "Resultados",
+            "Mensal",
+            "C Atualizar Meta",
+            "MONITORAMENTO ATIVO",
+            "Turno: 236,5 km rodados",
+            "9A68%",
+            "Corridas",
+            "LUCRo LÍQ"
+        )
+
+        assertTrue(
+            "Tela principal do DriFly precisa ser reconhecida como auto-leitura",
+            ParsingEngine.containsSelfOverlayMarkers(driflyMainTexts)
+        )
+        assertNull(
+            "Palavra 'Ajustar Meta' / 'Atualizar Meta' NÃO pode casar REGEX_ENDERECO como destino 'r Meta'",
+            ParsingEngine.extractDestinationAddress(driflyMainTexts)
+        )
+        assertNull(
+            "Tela do próprio DriFly NUNCA pode gerar oferta falsa",
+            ParsingEngine.parseNodes("com.app99.driver", driflyMainTexts, 0.2148, 4.75f)
+        )
+        assertEquals(
+            "ScreenRouter deve retornar Unknown para a própria tela do DriFly",
+            ScreenReading.Unknown,
+            ScreenRouter.read("com.app99.driver", driflyMainTexts, 0.2148, 4.75f, isRideCurrentlyActive = true)
+        )
+    }
+
+    @Test
+    fun testFadingSelfOverlayMixedWith99OfferCardIsRejected() {
+        // Captura REAL do diag.log (18:11:08.359): OCR leu restos do overlay DriFly ("RSTKVM", "TRSTHORA", "R$ 33")
+        // junto com a oferta da 99 (R$ 21,40) e sobrescreveu a corrida #95 para R$ 33,00.
+        val fadingOverlayTexts = listOf(
+            "18:11",
+            "O 99",
+            "202 m",
+            "Moto",
+            "R. Antônio Ramos Alvim",
+            "RSTKVM",
+            "oo RS 16 63",
+            "Vire à esquerda R$ 33",
+            "Rua Florianópoll, 2710 Guanab",
+            "TRSTHORA",
+            "R$21,40",
+            "0% de Taxa99 semanal",
+            "BR-280",
+            "9 R$1,25 Tarifa base dinâmica incl.",
+            "7 min (2,3 km)",
+            "t 5,00 56 corridas CPF verif.",
+            "Rua Joāo Luiz Filho, 1500, Centro",
+            "32 min (19,9 km)",
+            "Aceitar",
+            "Rua Florianópolis, 2710, Guanabara",
+            "♡ e75atarina",
+            "NOTA",
+            "5,"
+        )
+
+        assertNull(
+            "Captura contaminada pelo próprio overlay do DriFly deve ser descartada",
+            ParsingEngine.parseNodes("com.app99.driver", fadingOverlayTexts, 0.2148, 4.75f)
+        )
+    }
+
+    @Test
+    fun test99IdleBuscandoAndPromoBannerNeverBecomesReceiptOrOffer() {
+        // Capturas REAIS do diag.log (18:12:55.291 e 18:53:54.618):
+        // após finalizar a corrida #95, a 99 voltou para "Buscando" com banner "Você ganhou R$78,95 com o pacote 0% de Taxa",
+        // e o recibo sobrescreveu a corrida #95 com R$ 78,95!
+        val buscandoPromo = listOf(
+            "18:12", ")", "ámirim", "Rio Parati", "99", "Ver",
+            "% 0% de Taxa 14:49:46",
+            "Você ganhou R$78,95 com o pacote 0%",
+            "de Taxa", "CENTRO", "GANHERS500", "Buscando", "%"
+        )
+        val buscandoPromoWithKm = listOf(
+            "18:53", "SC-301", "M 99", "Ver",
+            "% 0% de Taxa 14:08:50",
+            "Você ganhou R$108,95 com o pacote 0%",
+            "de Taxa", "GANHERS500", "2,4 km", "Buscando"
+        )
+
+        assertTrue(
+            "Tela 'Buscando' da 99 precisa ser reconhecida como ociosa",
+            ParsingEngine.isIdleDriverScreen(buscandoPromo)
+        )
+        assertNull(
+            "Banner 'Você ganhou R$... com o pacote 0% de Taxa' NÃO pode virar recibo de corrida",
+            ParsingEngine.parseReceipt("com.app99.driver", buscandoPromo)
+        )
+        assertEquals(
+            ScreenReading.Unknown,
+            ScreenRouter.read("com.app99.driver", buscandoPromo, 0.2148, 4.75f, isRideCurrentlyActive = true)
+        )
+        assertNull(
+            "Tela ociosa 'Buscando' com banner promocional e km no mapa NÃO pode virar oferta",
+            ParsingEngine.parseNodes("com.app99.driver", buscandoPromoWithKm, 0.2148, 4.75f)
+        )
+    }
+
+    @Test
+    fun test99TopEarningsPillAndPromoOverOfferCardNeverStealRidePrice() {
+        // Quando a pílula de ganhos acumulados no topo da 99 (ou banner promocional) aparece junto com o card da corrida,
+        // o parser NUNCA pode usar o valor acumulado do topo em vez do valor real da corrida abaixo.
+        val offerWithPromoAndTopPill = listOf(
+            "18:13 O",
+            "R$108,95",
+            "Moto",
+            "9 99",
+            "Você ganhou R$78,95 com o pacote 0%",
+            "de Taxa",
+            "Moto",
+            "R$7,30",
+            "0% de Taxa99 semanal",
+            "R$1,25 Tarifa base dinâmica incl.",
+            "t 5,00 12 corridas",
+            "4 min (1,4 km)",
+            "Mundo do Caiaque, BR-280",
+            "8 min (4,3 km)",
+            "Rua Rosa Amélia Pereira Braga, 492, Areias Pequenas",
+            "Aceitar"
+        )
+        val offer1 = ParsingEngine.parseNodes("com.app99.driver", offerWithPromoAndTopPill, 0.2148, 4.75f)
+        assertNotNull("Oferta real abaixo da pílula do topo deve ser extraída", offer1)
+        assertEquals(7.30, offer1!!.price, 0.001)
+
+        val offerWithTopClockPill = listOf(
+            "18:13",
+            "R$ 108,95",
+            "Moto",
+            "99",
+            "R$ 12,30",
+            "0% de Taxa99 semanal",
+            "4 min (1,2 km)",
+            "5 min (2,8 km)",
+            "Aceitar"
+        )
+        val offer2 = ParsingEngine.parseNodes("com.app99.driver", offerWithTopClockPill, 0.2148, 4.75f)
+        assertNotNull("Oferta real com pílula de saldo ao lado do relógio deve usar preço da corrida", offer2)
+        assertEquals(12.30, offer2!!.price, 0.001)
+
+        val offer3WithoutClock = listOf(
+            "99",
+            "R$ 108,95",
+            "Moto",
+            "R$ 7,30",
+            "0% de Taxa99 semanal",
+            "4 min (1,4 km)",
+            "8 min (4,3 km)",
+            "Aceitar"
+        )
+        val offer3 = ParsingEngine.parseNodes("com.app99.driver", offer3WithoutClock, 0.2148, 4.75f)
+        assertNotNull("Oferta sem relógio visível ainda deve ignorar pílula acumulada acima do card", offer3)
+        assertEquals(7.30, offer3!!.price, 0.001)
+
+        val mapWithTopPillAndKmOnly = listOf(
+            "18:13 O",
+            "R$108,95",
+            "Moto",
+            "9 99",
+            "Recompensas (3)",
+            "1,4 km",
+            "Ganhe até R$104 >"
+        )
+        assertNull(
+            "Pílula do topo + Recompensas com km no mapa NÃO pode gerar oferta falsa",
+            ParsingEngine.parseNodes("com.app99.driver", mapWithTopPillAndKmOnly, 0.2148, 4.75f)
+        )
+    }
+
+    @Test
+    fun test99OfferWithPickupInMetersAndTripInKmIsParsedCorrectly() {
+        // Captura REAL do drifly_diag_20261114_125407.txt (11:41:30.348):
+        // Embarque "2 min (113 m)" + viagem "9 20 min (11,8 km)" antes descartava a corrida como R$ 14,10 / 0,11 km!
+        val realOfferTexts = listOf(
+            "11:41", "101", "99", "Moto", "ZONA INDUSTRIAL", "NORTE", "MORRO DO MEIO",
+            "R$14,10", "0% de Taxa99 semanal", "9 R$1,12 Tarifa base dinâmica incl.",
+            "* Passageiro novo CPF verif.", "2 min (113 m)", "9 20 min (11,8 km)", "9A 65%",
+            "Brasil Atacadista, Rua Albano Schmidt, 1200 - Boa", "Vista",
+            "Rua José Gorges Filho, 59, Vila Nova", "Aceitar", "X", "+", "Topo", "Joinville- Laurc", "COMA"
+        )
+
+        val offer = ParsingEngine.parseNodes("com.app99.driver", realOfferTexts, 0.2148, 4.75f)
+        assertNotNull("Oferta real da 99 com embarque em metros deve ser detectada", offer)
+        assertEquals(14.10, offer!!.price, 0.001)
+        assertEquals(11.91, offer.distanceKm, 0.02)
+        assertEquals(22, offer.durationMinutes)
+        assertEquals("Rua José Gorges Filho, 59, Vila Nova", offer.destinationAddress)
+    }
+
+    @Test
+    fun test99FreeGpsNavigationToDemandZoneIsNotActiveRideAndNotOffer() {
+        // Captura REAL do drifly_diag_20261114_125407.txt (10:49:56.398):
+        // Motorista clicou em "Navegar" no mapa de demanda da 99 (sem nenhuma corrida aceita).
+        val freeGpsNavTexts = listOf(
+            "58", "m", "Vire à esquerda", "Rua São Leopoldo, 129", "0", "km/h",
+            "15 min", "9,2 km", "Chegada prevista:", "11:04"
+        )
+
+        assertFalse(
+            "Navegação livre até zona de demanda NÃO pode ser classificada como corrida ativa",
+            ParsingEngine.isActiveRideOrNavigationScreen(freeGpsNavTexts)
+        )
+        assertEquals(
+            "ScreenRouter deve retornar Unknown para navegação livre sem corrida",
+            ScreenReading.Unknown,
+            ScreenRouter.read("com.app99.driver", freeGpsNavTexts, 0.2148, 4.75f, isRideCurrentlyActive = false)
+        )
+        assertNull(
+            "Navegação GPS sem card de oferta nunca deve gerar oferta mesmo se houver saldo na tela",
+            ParsingEngine.parseNodes("com.app99.driver", freeGpsNavTexts + listOf("R$ 47,40"), 0.2148, 4.75f)
+        )
+    }
+
+    @Test
+    fun test99ActiveRideSafetyBannerAndDropOffFromRealLog() {
+        // Log real 14:21:42: aviso de segurança nativo durante corrida ativa da 99
+        val safetyHudTexts = listOf(
+            "O passageiro pode gravar por segurança",
+            "Compartilhar rota?",
+            "Ajustes",
+            "0",
+            "km/h",
+            "Ir"
+        )
+        assertTrue(
+            "Aviso de segurança durante viagem da 99 deve indicar corrida ativa",
+            ParsingEngine.isActiveRideOrNavigationScreen(safetyHudTexts)
+        )
+        assertEquals(
+            ScreenReading.ActiveRide,
+            ScreenRouter.read("com.app99.driver", safetyHudTexts, 0.2148, 4.75f, isRideCurrentlyActive = false)
+        )
+
+        // Log real 14:27:43: tela de desembarque com "Pagamento no aplicativo"
+        val dropOffTexts = listOf("Chegada prevista: 14:28", "Pagamento no aplicativo", "R$ 5,20")
+        assertTrue(ParsingEngine.isActiveRideOrNavigationScreen(dropOffTexts))
+        assertEquals(
+            ScreenReading.ActiveRide,
+            ScreenRouter.read("com.app99.driver", dropOffTexts, 0.2148, 4.75f, isRideCurrentlyActive = false)
+        )
+
+        // Painel de histórico de corridas nunca deve marcar corrida ativa nem recibo
+        val historyPanelTexts = listOf("Histórico de corridas", "Ganhos", "R$ 21,00", "Pagamento no aplicativo")
+        assertFalse(ParsingEngine.isActiveRideOrNavigationScreen(historyPanelTexts))
+        assertEquals(
+            ScreenReading.Unknown,
+            ScreenRouter.read("com.app99.driver", historyPanelTexts, 0.2148, 4.75f, isRideCurrentlyActive = true)
+        )
+    }
+
+    @Test
+    fun test99PostRideRatingAndSafetyReceiptRequiresActiveRide() {
+        // Log real 14:27:45 e 14:27:50: telas pós-corrida da 99 sem tela prévia de "Você ganhou R$"
+        val ratingScreenTexts = listOf(
+            "Como foi sua corrida com João?",
+            "Seu feedback sincero pode ajudar",
+            "Avaliar como anônimo",
+            "Enviar"
+        )
+        val safetyCheckTexts = listOf(
+            "Você se sentiu seguro(a) nesta corrida?",
+            "Sim",
+            "Não"
+        )
+
+        val ratingReadingActive = ScreenRouter.read(
+            "com.app99.driver", ratingScreenTexts, 0.2148, 4.75f, isRideCurrentlyActive = true
+        )
+        assertTrue(ratingReadingActive is ScreenReading.Receipt)
+        val ratingReceipt = (ratingReadingActive as ScreenReading.Receipt).receipt
+        assertTrue(ratingReceipt.isCompleted)
+        assertNull(ratingReceipt.finalPrice)
+        assertEquals(RideRecord.STATUS_CONCLUIDO, ratingReceipt.status)
+
+        val safetyReadingActive = ScreenRouter.read(
+            "com.app99.driver", safetyCheckTexts, 0.2148, 4.75f, isRideCurrentlyActive = true
+        )
+        assertTrue(safetyReadingActive is ScreenReading.Receipt)
+        assertTrue((safetyReadingActive as ScreenReading.Receipt).receipt.isCompleted)
+
+        // Sem corrida ativa, telas de avaliação não devem disparar recibo falso
+        assertEquals(
+            ScreenReading.Unknown,
+            ScreenRouter.read("com.app99.driver", ratingScreenTexts, 0.2148, 4.75f, isRideCurrentlyActive = false)
+        )
+        assertEquals(
+            ScreenReading.Unknown,
+            ScreenRouter.read("com.app99.driver", safetyCheckTexts, 0.2148, 4.75f, isRideCurrentlyActive = false)
+        )
+    }
+
+    @Test
+    fun testShouldVerifyFlutterLayerViaOcrFor99HybridScreens() {
+        val nativeGpsHud = listOf("109", "m", "R. Jacob Richlin", "Rua Corupá, 386", "12", "km/h")
+        assertTrue(ParsingEngine.shouldVerifyFlutterLayerViaOcr("com.app99.driver", nativeGpsHud, hasPendingOffer = false))
+        assertTrue(ParsingEngine.shouldVerifyFlutterLayerViaOcr("com.app99.driver", nativeGpsHud, hasPendingOffer = true))
+
+        assertFalse(
+            ParsingEngine.shouldVerifyFlutterLayerViaOcr(
+                "com.app99.driver",
+                listOf("Buscando", "Recompensas", "R$ 15,80"),
+                hasPendingOffer = true
+            )
+        )
+        assertFalse(
+            ParsingEngine.shouldVerifyFlutterLayerViaOcr(
+                "com.app99.driver",
+                listOf("Histórico de corridas", "Ganhos"),
+                hasPendingOffer = false
+            )
+        )
+        assertFalse(
+            ParsingEngine.shouldVerifyFlutterLayerViaOcr(
+                "com.app99.driver",
+                listOf("Rua São Leopoldo, 129", "Demanda alta", "Navegar", "Como funciona o mapa"),
+                hasPendingOffer = false
+            )
+        )
+        assertFalse(
+            ParsingEngine.shouldVerifyFlutterLayerViaOcr(
+                "com.ubercab.driver",
+                nativeGpsHud,
+                hasPendingOffer = true
+            )
+        )
+    }
+
+    @Test
+    fun testAcceptActionTextHandlesOcrArtifactsAndAvoidsRateText() {
+        assertTrue(ParsingEngine.isAcceptActionText("Aceitar >"))
+        assertTrue(ParsingEngine.isAcceptActionText("Aceitar"))
+        assertTrue(ParsingEngine.isAcceptActionText("Pegar!"))
+        assertFalse(ParsingEngine.isAcceptActionText("Taxa de Aceitação"))
+        assertFalse(ParsingEngine.isAcceptActionText("Aceitar ✅"))
+    }
+
+    @Test
+    fun testNov16CashRideDropOffScreenIsActiveRideAndNotPickupPhase() {
+        // Log real 16/11 13:13:57: aproximação final de corrida em dinheiro na 99
+        val cashDropOffTexts = listOf(
+            "13:13 9 99", "0", "km/h", "60", "m", "Av. Paulo...",
+            "1 min 60 m", "• Chegada prevista: 13:14",
+            "$ Corrida em dinheiro", "Cobrar pagamento"
+        )
+        assertTrue(ParsingEngine.isActiveRideOrNavigationScreen(cashDropOffTexts))
+        assertFalse(
+            "Tela de desembarque/cobrança não pode ser confundida com início de fase de embarque",
+            ParsingEngine.isPickupPhaseScreen(cashDropOffTexts)
+        )
+        assertTrue(
+            ParsingEngine.isPickupPhaseScreen(
+                listOf("13:16 9 99", "18 km/h", "A caminho do passageiro", "Cheguei ao local")
+            )
+        )
+    }
+
+    @Test
+    fun testNov16CashCollectionAndRatingScreensCompleteRideWithCorrectPrice() {
+        // 1. Log real 16/11 13:14:40: "Seus ganhos | Cobrar do passageiro | R$16,64 | Detalhes da tarifa | ... | R$17,80"
+        val cashCollectionTexts = listOf(
+            "13:14 | 99", "Seus ganhos", "1$1 Cobrar do passageiro", "R$16,64",
+            "Detalhes da tarifa", "Valor devolvido após o pagamento (prÓximo seg)",
+            "Receba em dinheiro ou Pix", "O passageiro pagou", "R$17,80"
+        )
+        val cashReading = ScreenRouter.read(
+            "com.app99.driver", cashCollectionTexts, 0.2148, 4.75f, isRideCurrentlyActive = true
+        )
+        assertTrue("Tela 'Cobrar do passageiro' deve gerar recibo de conclusão", cashReading is ScreenReading.Receipt)
+        val cashReceipt = (cashReading as ScreenReading.Receipt).receipt
+        assertTrue(cashReceipt.isCompleted)
+        assertTrue(cashReceipt.isCashCollectionScreen)
+        assertEquals(17.80, cashReceipt.finalPrice ?: 0.0, 0.001)
+
+        // 2. Log real 16/11 13:15:00: "R$16,64 | Pagamento recebido! | Confirmar | Verificar pagamento >"
+        // Deve concluir mantendo finalPrice = null para nunca sobrescrever originalPrice (R$17,80) com troco/parcial (R$16,64)
+        val paymentReceivedTexts = listOf(
+            "13:14 9 | 99", "R$16,64", "Pagamento recebido!", "Confirmar", "♡A N42%", "Verificar pagamento >"
+        )
+        val paymentReading = ScreenRouter.read(
+            "com.app99.driver", paymentReceivedTexts, 0.2148, 4.75f, isRideCurrentlyActive = true
+        )
+        assertTrue(paymentReading is ScreenReading.Receipt)
+        val paymentReceipt = (paymentReading as ScreenReading.Receipt).receipt
+        assertTrue(paymentReceipt.isCompleted)
+        assertNull("Pagamento recebido! não deve sobrescrever o valor da corrida com o valor parcial em dinheiro", paymentReceipt.finalPrice)
+
+        // 3. Log real 16/11 13:15:05: modal "Como foi sua corrida com Carla Cristina?" sobreposto a "Seus ganhos"
+        val ratingOverCashTexts = listOf(
+            "13:15 90 99", "Seus ganhos", "1$1 Cobrar do passageiro", "R$16,64",
+            "Avaliar como anônimo", "Ajuda", "R$17,80",
+            "Como foi sua corrida com Carla Cristina?",
+            "Seu feedback sincero pode ajudar outros motoristas"
+        )
+        val ratingReading = ScreenRouter.read(
+            "com.app99.driver", ratingOverCashTexts, 0.2148, 4.75f, isRideCurrentlyActive = true
+        )
+        assertTrue(ratingReading is ScreenReading.Receipt)
+        assertTrue((ratingReading as ScreenReading.Receipt).receipt.isCompleted)
+
+        // 4. Log real 16/11 13:15:15: modal "Você gostou do local de desembarque?" sobreposto a "Seus ganhos"
+        val dropoffFeedbackTexts = listOf(
+            "13:15 9 99", "Seus ganhos", "1$1 Cobrar do passageiro", "R$16,64",
+            "Você gostou do local de desembarque?", "Ajuda", "R$17,80", "Sim", "X"
+        )
+        val dropoffReading = ScreenRouter.read(
+            "com.app99.driver", dropoffFeedbackTexts, 0.2148, 4.75f, isRideCurrentlyActive = true
+        )
+        assertTrue(dropoffReading is ScreenReading.Receipt)
+        assertTrue((dropoffReading as ScreenReading.Receipt).receipt.isCompleted)
+
+        // 5. Log real 16/11 13:15:20 e 14/11 14:40:14: "Valor da corrida | +R$17,80 | ... | Buscando"
+        val postRideSummaryToast = listOf(
+            "13:15 9 99", "Valor da corrida", "+R$17,80",
+            "Você ganhou R$84,1 com o pacote 0% de", "Taxa", "GANHERS500", "Buscando", "X", "%"
+        )
+        val summaryReading = ScreenRouter.read(
+            "com.app99.driver", postRideSummaryToast, 0.2148, 4.75f, isRideCurrentlyActive = true
+        )
+        assertTrue(summaryReading is ScreenReading.Receipt)
+        val summaryReceipt = (summaryReading as ScreenReading.Receipt).receipt
+        assertTrue(summaryReceipt.isCompleted)
+        assertFalse(summaryReceipt.isCashCollectionScreen)
+        assertEquals(17.80, summaryReceipt.finalPrice ?: 0.0, 0.001)
+    }
+
+    @Test
+    fun testNov16TopBalancePillAndNov14TruncatedPromoBannerNeverBecomeOffers() {
+        // Log real 16/11 13:15:25: pílula do topo "Taxa | R$88,95 | Ver" com escala do mapa "200 m"
+        val topBalancePillTexts = listOf(
+            "13:15 0 99", ")", "On:", "ha Frd", "Taxa", "R$88,95", "Ver", "200 m", "500 ft"
+        )
+        assertNull(
+            "Pílula de saldo acumulado R$88,95 no topo do mapa nunca pode virar oferta",
+            ParsingEngine.parseNodes("com.app99.driver", topBalancePillTexts, 0.2148, 4.75f)
+        )
+
+        // Log real 14/11 14:40:21: banner promocional truncado pelo OCR "...ou R$68,4 com" + escala "200 m"
+        val truncatedPromoTexts = listOf(
+            "14:40 M 99", "Taxa", "Ver", "ou R$68,4 com", "GANHERS500", "200 m", "500 ft"
+        )
+        assertNull(
+            "Banner promocional truncado 'ou R$68,4 com' nunca pode virar oferta",
+            ParsingEngine.parseNodes("com.app99.driver", truncatedPromoTexts, 0.2148, 4.75f)
+        )
+    }
+
+    // ---------------------------------------------------------------------------------------------
+    // BUG B: valor FINAL da última corrida lido na home da 99 ("Valor da última corrida").
+    // A 99 desenha o VALOR ACIMA do rótulo; o valor de "Ganhos desta semana" vem DEPOIS do rótulo.
+    // ---------------------------------------------------------------------------------------------
+
+    @Test
+    fun testExtractLastRideValueFrom99Home() {
+        // OCR real de 10:25:24 (valor da última corrida = 5,10; 6,46 é "Ganhos desta semana").
+        val homeReal = listOf(
+            "10:25", "9 99", "Painel Editar", "R$5,10", "Valor da útima corrida", "R$6,46",
+            "Ganhos desta semana", "Rota 99", "Moto Fase 1", "R$6,46", "R$3,23", "Buscando"
+        )
+        assertEquals(5.10, ParsingEngine.extractLastRideValueFromHome(homeReal)!!, 0.001)
+
+        // OCR real de 21/11 09:07 (última corrida 12,10; 175,57 é o acumulado da semana).
+        val homeAntiga = listOf(
+            "09:07", "S99", "Painel Editar", "R$12,10", "Valor da última corrida", "R$175,57",
+            "Ganhos desta semana", "Termina às 23:59", "Rota 99", "Recompensa (1)"
+        )
+        assertEquals(12.10, ParsingEngine.extractLastRideValueFromHome(homeAntiga)!!, 0.001)
+
+        // Layout com o valor DEPOIS do rótulo e sem acumulado colado.
+        val valorDepois = listOf("Valor da última corrida", "R$5,10")
+        assertEquals(5.10, ParsingEngine.extractLastRideValueFromHome(valorDepois)!!, 0.001)
+
+        // OCR quebrado: "R$" e o número em linhas diferentes.
+        val moedaSeparada = listOf("R$", "7,60", "Valor da útima corrida")
+        assertEquals(7.60, ParsingEngine.extractLastRideValueFromHome(moedaSeparada)!!, 0.001)
+    }
+
+    @Test
+    fun testExtractLastRideValueRejectsAmbiguousOrMissingLabel() {
+        // Dois valores diferentes vizinhos, sem rótulo de ganhos separando: ambíguo.
+        val ambiguo = listOf("R$5,10", "Valor da última corrida", "R$6,46")
+        assertNull(ParsingEngine.extractLastRideValueFromHome(ambiguo))
+
+        // Mesmo valor dos dois lados: não é ambíguo.
+        val mesmoValor = listOf("R$5,10", "Valor da última corrida", "R$5,10")
+        assertEquals(5.10, ParsingEngine.extractLastRideValueFromHome(mesmoValor)!!, 0.001)
+
+        // Sem o rótulo (toast "Valor da corrida" é do recibo, não da home).
+        assertNull(ParsingEngine.extractLastRideValueFromHome(listOf("Valor da corrida", "+R$5,75")))
+        assertNull(ParsingEngine.extractLastRideValueFromHome(listOf("R$5,10", "Buscando", "99")))
+        assertNull(ParsingEngine.extractLastRideValueFromHome(emptyList()))
+    }
+
+    @Test
+    fun testOcrLeZeroComoLetraO_SomaOsDoisTrechos() {
+        // Texto REAL da 99 em 24/11 11:57. O OCR leu "10,6" como "1O,6" (letra O).
+        // Antes: 6,0 km (fallback "maior km da tela") e aceite automático com R$2,17/km.
+        // Agora: 5,9 + 10,6 = 16,5 km e R$0,79/km, sem incerteza.
+        val texts = listOf(
+            "11:57", "99", "Moto", "R$13,00", "0% de Taxa99 semanal",
+            "R$1,12 Tarifa base dinâmica incl.",
+            "11 min (5,9 km)", "Rua Praia Grande, 29, Comasa",
+            "18 min (1O,6 km)",
+            "Aceitar"
+        )
+        val offer = ParsingEngine.parseNodes(
+            packageName = "com.app99.driver",
+            texts = texts,
+            costPerKm = 0.2148,
+            minRatingThreshold = 4.85f
+        )
+
+        assertNotNull("Oferta com O no lugar do zero deve ser lida", offer)
+        assertEquals(13.0, offer!!.price, 0.001)
+        assertEquals(16.5, offer.distanceKm, 0.01)
+        assertEquals(0.79, offer.ratePerKm, 0.01)
+        assertEquals(5.9, offer.pickupDistanceKm ?: 0.0, 0.01)
+        assertEquals(10.6, offer.tripDistanceKm ?: 0.0, 0.01)
+        assertFalse("Com os dois trechos lidos a distância não é incerta", offer.isDistanceUncertain)
+    }
+
+    @Test
+    fun testDoisTrechosComKmIlegivelMarcaDistanciaIncerta() {
+        // Card com dois trechos, mas o km do segundo não dá para ler: não pode auto-aceitar.
+        val texts = listOf(
+            "99", "Moto", "R$10,70", "2 min (320 m)", "15 min (?? km)", "Aceitar"
+        )
+        val offer = ParsingEngine.parseNodes(
+            packageName = "com.app99.driver",
+            texts = texts,
+            costPerKm = 0.2148,
+            minRatingThreshold = 4.85f
+        )
+
+        assertNotNull(offer)
+        assertTrue(
+            "Com dois trechos e só um lido, a distância total é desconhecida",
+            offer!!.isDistanceUncertain
+        )
+    }
+
+    @Test
+    fun testEnderecoComRotuloDeMapaNaoViraDestino() {
+        // Texto REAL da 99 em 24/11 12:35. "Rua Henrique Meyer" é rótulo do mapa (seguido de "300 m 12:45"),
+        // não o destino. O destino real é "Rua Arara, 321, Aventureiro".
+        val texts = listOf(
+            "12:35", "99", "Moto", "R$10,70", "R$1,30/km",
+            "2 min (320 m)", "15 min (7,9 km)",
+            "Rua XV de Novembro, 867, América",
+            "Rua Arara, 321, Aventureiro",
+            "Aceitar", "SC-418", "X", "R. Exp",
+            "Rua Henrique Meyer", "300 m 12:45", "53%"
+        )
+
+        val pickup = ParsingEngine.extractPickupAddress(texts)
+        val destination = ParsingEngine.extractDestinationAddress(texts)
+
+        assertEquals("Rua XV de Novembro, 867, América", pickup)
+        assertEquals("Rua Arara, 321, Aventureiro", destination)
+        assertTrue(
+            "Rótulo de mapa com ETA não pode entrar na lista de endereços",
+            ParsingEngine.extractAllAddresses(texts).none { it.contains("Henrique Meyer") }
+        )
+    }
+
+    @Test
+    fun testEnderecoQuebradoEmDuasLinhasEhRemontado() {
+        // "Rua XV de Novembro," + "4315 - Glória" é um endereço só (o número veio na linha de baixo).
+        val texts = listOf(
+            "11:57", "99", "Moto", "R$13,00",
+            "11 min (5,9 km)", "Rua Praia Grande, 29, Comasa",
+            "18 min (10,6 km)", "Aceitar",
+            "Parque Expoville Atividades, Rua XV de Novembro,", "4315 - Glória"
+        )
+
+        assertEquals(
+            "Rua XV de Novembro, 4315 - Glória",
+            ParsingEngine.extractDestinationAddress(texts)
+        )
+    }
+
+    @Test
+    fun testCashScreenWithFuelBubblePercentageMergedIntoCurrencyNeverOverridesFare() {
+        // Texto REAL de 26/11 10:51:24 (corrida #16, oferta R$6,40):
+        // A bolinha de combustível em 83% colou num "R$" no rodapé da tela "Cobrar do passageiro"
+        // formando "R$ 83%", que antes virava finalPrice=83.0 e sobrescrevia R$6,40 por R$83,00.
+        val cashScreenWithBubble = listOf(
+            "10:51 M O 99", "Seus ganhos", "$1 Cobrar do passageiro", "Detalhes da tarifa",
+            "R$ 6,21", "Taxa99 semanal de 0% garantida",
+            "Valor devolvido após o pagamento (prÓxima seg)", "9A 60%",
+            "Receba em dinheiro ou Pix", "O passageiro pagou", "Problema ao receber",
+            "Ajuda", "Por favor, não tire fotos. O QR cOde expira em 178", "segundo(s)",
+            "0", "km/h", "R$ 83%"
+        )
+
+        val reading = ScreenRouter.read(
+            "com.app99.driver", cashScreenWithBubble, 0.2148, 4.85f, isRideCurrentlyActive = true
+        )
+        assertTrue(reading is ScreenReading.Receipt)
+        val receipt = (reading as ScreenReading.Receipt).receipt
+        assertTrue(receipt.isCompleted)
+        assertTrue(receipt.isCashCollectionScreen)
+        assertEquals(
+            "Porcentagem 'R$ 83%' da bolinha nunca pode ser lida como valor de corrida",
+            6.21,
+            receipt.finalPrice ?: 0.0,
+            0.001
+        )
+
+        // Mesmo que um valor absurdo passe pelo OCR numa tela de cobrança em dinheiro,
+        // resolveReceiptFinalPrice aplica o teto de plausibilidade e preserva o original.
+        assertEquals(6.40, ParsingEngine.resolveReceiptFinalPrice(83.0, 6.40, isCashCollectionScreen = true), 0.001)
+        assertEquals(6.40, ParsingEngine.resolveReceiptFinalPrice(86.0, 6.40, isCashCollectionScreen = true), 0.001)
+        assertEquals(6.40, ParsingEngine.resolveReceiptFinalPrice(6.21, 6.40, isCashCollectionScreen = true), 0.001)
+        assertEquals(7.10, ParsingEngine.resolveReceiptFinalPrice(7.10, 6.40, isCashCollectionScreen = true), 0.001)
+        assertEquals(6.40, ParsingEngine.resolveReceiptFinalPrice(2.00, 6.40, isCashCollectionScreen = true), 0.001)
+
+        // Em oferta comum, "R$ 86%" também nunca pode ser extraído como preço.
+        val offerWithBubblePercent = listOf(
+            "10:12", "99", "Moto", "R$ 86%", "R$ 6,20", "0% de Taxa99 semanal",
+            "3 min (1,0 km)", "7 min (3,3 km)", "Aceitar"
+        )
+        val offer = ParsingEngine.parseNodes("com.app99.driver", offerWithBubblePercent, 0.2148, 4.85f)
+        assertNotNull(offer)
+        assertEquals(6.20, offer!!.price, 0.001)
+    }
+
+    @Test
+    fun testDeclineTargetSelectionHandlesExactXAndNoImpactBadge() {
+        // Caso 1: "X Não afeta a TA" no topo direito (log real 26/11 10:57)
+        val linesWithBadge = listOf(
+            DeclineOcrBox("Moto", 20, 40, 120, 80),
+            DeclineOcrBox("R$12,20", 20, 90, 200, 150),
+            DeclineOcrBox("X Não afeta a TA", 455, 65, 695, 115),
+            DeclineOcrBox("Aceitar", 100, 1380, 620, 1480),
+            DeclineOcrBox("X", 650, 1250, 690, 1290) // X aleatório na parte inferior da tela
+        )
+        val target1 = ParsingEngine.selectDeclineTarget(linesWithBadge, screenWidth = 720, screenHeight = 1600)
+        assertNotNull(target1)
+        assertEquals("X Não afeta a TA", target1!!.text)
+        assertTrue(target1.tapLeftEdge)
+
+        // Caso 2: Só "X" no topo direito (log real 26/11 10:59)
+        val linesWithOnlyX = listOf(
+            DeclineOcrBox("Moto", 20, 40, 120, 80),
+            DeclineOcrBox("R$11,10", 20, 90, 200, 150),
+            DeclineOcrBox("X", 649, 70, 689, 110),
+            DeclineOcrBox("Aceitar", 100, 1380, 620, 1480)
+        )
+        val target2 = ParsingEngine.selectDeclineTarget(linesWithOnlyX, screenWidth = 720, screenHeight = 1600)
+        assertNotNull(target2)
+        assertEquals("X", target2!!.text)
+        assertFalse(target2.tapLeftEdge)
+
+        // Caso 3: OCR perdeu o "X" do selo e leu apenas "Não afeta a TA" no topo
+        val linesWithoutLeadingX = listOf(
+            DeclineOcrBox("R$9,90", 20, 90, 200, 150),
+            DeclineOcrBox("Não afeta a TA", 495, 65, 695, 115),
+            DeclineOcrBox("Aceitar", 100, 1380, 620, 1480)
+        )
+        val target3 = ParsingEngine.selectDeclineTarget(linesWithoutLeadingX, screenWidth = 720, screenHeight = 1600)
+        assertNotNull(target3)
+        assertEquals("Não afeta a TA", target3!!.text)
+        assertTrue(target3.tapLeftEdge)
+    }
+}

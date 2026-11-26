@@ -1,0 +1,614 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Aba Mapa & Navegação 100% Offline (MapLibre Native Android).
+    Preserva 100% dos IDs dos sinais colaborativos e adiciona:
+    - Barra de busca offline (joinville_geocoder.db FTS5) + status do pacote offline;
+    - Lista de sugestões de busca offline + atalho "Casa";
+    - Prévia de rota multi-paradas + evasão da Lista Negra (view_route_preview);
+    - Overlay Turn-by-Turn 3D + voz pt-BR + simulação (view_nav_overlay);
+    - Gerenciador do pacote offline Joinville (view_offline_pack_sheet).
+-->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/mapRoot"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_light_screen">
+
+    <!-- Container do MapView (MapLibre Native) -->
+    <FrameLayout
+        android:id="@+id/mapContainer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <!-- Topo no modo exploração: Busca Offline + Chips de Sinais + Banner Localização -->
+    <LinearLayout
+        android:id="@+id/mapTopControls"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top"
+        android:orientation="vertical">
+
+        <!-- Barra de busca flutuante + pill de status do pacote offline -->
+        <LinearLayout
+            android:id="@+id/mapSearchBarRow"
+            android:layout_width="match_parent"
+            android:layout_height="46dp"
+            android:layout_marginHorizontal="10dp"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/bg_map_card"
+            android:elevation="5dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingHorizontal="12dp">
+
+            <ImageView
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:contentDescription="Buscar endereço"
+                android:src="@drawable/ic_nav_search" />
+
+            <EditText
+                android:id="@+id/etMapSearch"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginStart="8dp"
+                android:layout_weight="1"
+                android:background="@null"
+                android:hint="Para onde vamos?"
+                android:imeOptions="actionSearch"
+                android:inputType="text"
+                android:maxLines="1"
+                android:singleLine="true"
+                android:textColor="@color/drifly_ink"
+                android:textColorHint="@color/drifly_mut"
+                android:textSize="13.5sp" />
+
+            <TextView
+                android:id="@+id/btnMapSearchClear"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:background="@drawable/bg_light_circle"
+                android:clickable="true"
+                android:contentDescription="Limpar busca"
+                android:focusable="true"
+                android:gravity="center"
+                android:text="×"
+                android:textColor="@color/drifly_mut"
+                android:textSize="17sp"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/btnMapPackStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="28dp"
+                android:layout_marginStart="6dp"
+                android:background="@drawable/bg_light_pill_orange"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center"
+                android:maxLines="1"
+                android:paddingHorizontal="9dp"
+                android:singleLine="true"
+                android:text="Mapas"
+                android:textColor="@color/drifly_orange_deep"
+                android:textSize="11sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <!-- Sugestões da busca offline (aparece ao digitar ou focar no campo) -->
+        <LinearLayout
+            android:id="@+id/mapSearchResultsCard"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="10dp"
+            android:layout_marginTop="4dp"
+            android:background="@drawable/bg_map_card"
+            android:elevation="8dp"
+            android:orientation="vertical"
+            android:paddingVertical="4dp"
+            android:visibility="gone">
+
+            <ScrollView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:maxHeight="260dp"
+                android:overScrollMode="never">
+
+                <LinearLayout
+                    android:id="@+id/mapSearchResultsList"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical" />
+            </ScrollView>
+        </LinearLayout>
+
+        <!-- Chips de filtro (.mchips) -->
+        <HorizontalScrollView
+            android:id="@+id/mapChipsScroll"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:clipToPadding="false"
+            android:overScrollMode="never"
+            android:paddingHorizontal="10dp"
+            android:paddingVertical="4dp"
+            android:scrollbars="none">
+
+            <LinearLayout
+                android:id="@+id/mapChips"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal" />
+        </HorizontalScrollView>
+
+        <!-- Faixa discreta quando falta permissão de localização -->
+        <LinearLayout
+            android:id="@+id/mapLocationBanner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="10dp"
+            android:layout_marginTop="4dp"
+            android:background="@drawable/bg_map_legend"
+            android:elevation="3dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingHorizontal="12dp"
+            android:paddingVertical="8dp"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/mapLocationText"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:singleLine="true"
+                android:text="Ative a localização para ver sua posição"
+                android:textColor="@color/drifly_mut"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/mapLocationAction"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true"
+                android:maxLines="1"
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="2dp"
+                android:singleLine="true"
+                android:text="Ativar"
+                android:textColor="@color/drifly_orange"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+        <!-- Atribuição obrigatória do OpenFreeMap (visível apenas no modo mapa online, sempre livre de sobreposição) -->
+        <TextView
+            android:id="@+id/tvMapOnlineAttribution"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="4dp"
+            android:background="@drawable/bg_map_legend"
+            android:elevation="3dp"
+            android:maxLines="1"
+            android:paddingHorizontal="8dp"
+            android:paddingVertical="3dp"
+            android:singleLine="true"
+            android:text="OpenFreeMap © OpenMapTiles · Data from OpenStreetMap"
+            android:textColor="@color/drifly_mut"
+            android:textSize="10sp"
+            android:visibility="gone" />
+    </LinearLayout>
+
+    <!-- Aviso discreto: Firestore ligado e nenhum sinal na área visível -->
+    <TextView
+        android:id="@+id/mapEmptyHint"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center_horizontal"
+        android:layout_marginBottom="64dp"
+        android:background="@drawable/bg_map_legend"
+        android:elevation="3dp"
+        android:maxLines="1"
+        android:paddingHorizontal="14dp"
+        android:paddingVertical="8dp"
+        android:singleLine="true"
+        android:text="Nenhum sinal por aqui ainda"
+        android:textColor="@color/drifly_mut"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        android:visibility="gone" />
+
+    <!-- Banner de sugestão de download quando o motorista está fora de pacotes instalados -->
+    <LinearLayout
+        android:id="@+id/mapRegionBanner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:layout_marginHorizontal="10dp"
+        android:layout_marginBottom="56dp"
+        android:background="@drawable/bg_map_card"
+        android:clickable="true"
+        android:elevation="7dp"
+        android:focusable="true"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingHorizontal="12dp"
+        android:paddingVertical="10dp"
+        android:visibility="gone">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tvRegionBannerTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="2"
+                android:text="Baixar Pará para buscar e navegar offline"
+                android:textColor="@color/drifly_ink"
+                android:textSize="12.5sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvRegionBannerSubtitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:singleLine="true"
+                android:text="Mapa online ativo · rotas e busca precisam do pacote"
+                android:textColor="@color/drifly_mut"
+                android:textSize="11sp" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/btnRegionBannerAction"
+            android:layout_width="wrap_content"
+            android:layout_height="34dp"
+            android:layout_marginStart="8dp"
+            android:background="@drawable/bg_btn_primary_gradient"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center"
+            android:maxLines="1"
+            android:paddingHorizontal="12dp"
+            android:singleLine="true"
+            android:text="Baixar"
+            android:textColor="#FFFFFF"
+            android:textSize="12sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/btnRegionBannerClose"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:layout_marginStart="6dp"
+            android:background="@drawable/bg_light_circle"
+            android:clickable="true"
+            android:contentDescription="Dispensar aviso"
+            android:focusable="true"
+            android:gravity="center"
+            android:text="×"
+            android:textColor="@color/drifly_mut"
+            android:textSize="16sp" />
+    </LinearLayout>
+
+    <!-- Legenda (.lgd) numa faixa branca flutuante -->
+    <HorizontalScrollView
+        android:id="@+id/mapLegendScroll"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:layout_marginHorizontal="10dp"
+        android:layout_marginBottom="12dp"
+        android:background="@drawable/bg_map_legend"
+        android:clipToPadding="false"
+        android:elevation="3dp"
+        android:overScrollMode="never"
+        android:paddingHorizontal="12dp"
+        android:paddingVertical="8dp"
+        android:scrollbars="none">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <View
+                android:id="@+id/legendDotOk"
+                android:layout_width="12dp"
+                android:layout_height="12dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="6dp"
+                android:maxLines="1"
+                android:singleLine="true"
+                android:text="Confirmado"
+                android:textColor="@color/drifly_mut"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+
+            <View
+                android:id="@+id/legendDotPending"
+                android:layout_width="12dp"
+                android:layout_height="12dp"
+                android:layout_marginStart="14dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="6dp"
+                android:maxLines="1"
+                android:singleLine="true"
+                android:text="A confirmar"
+                android:textColor="@color/drifly_mut"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+
+            <View
+                android:id="@+id/legendDotArea"
+                android:layout_width="12dp"
+                android:layout_height="12dp"
+                android:layout_marginStart="14dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="6dp"
+                android:maxLines="1"
+                android:singleLine="true"
+                android:text="Área"
+                android:textColor="@color/drifly_mut"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+
+            <View
+                android:id="@+id/legendDotEvent"
+                android:layout_width="12dp"
+                android:layout_height="12dp"
+                android:layout_marginStart="14dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="6dp"
+                android:maxLines="1"
+                android:singleLine="true"
+                android:text="Paga+"
+                android:textColor="@color/drifly_mut"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+
+            <View
+                android:id="@+id/legendDotMe"
+                android:layout_width="12dp"
+                android:layout_height="12dp"
+                android:layout_marginStart="14dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="6dp"
+                android:maxLines="1"
+                android:singleLine="true"
+                android:text="Você"
+                android:textColor="@color/drifly_mut"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+    </HorizontalScrollView>
+
+    <!-- Botão flutuante: centralizar na minha posição (.mrc) -->
+    <ImageButton
+        android:id="@+id/btnMapCenter"
+        android:layout_width="42dp"
+        android:layout_height="42dp"
+        android:layout_gravity="bottom|end"
+        android:layout_marginEnd="12dp"
+        android:layout_marginBottom="112dp"
+        android:background="@drawable/bg_light_circle"
+        android:contentDescription="Centralizar na minha posição"
+        android:elevation="4dp"
+        android:padding="11dp"
+        android:scaleType="fitCenter"
+        android:src="@drawable/ic_map_target" />
+
+    <!-- Botão flutuante: sinalizar no mapa (.mfab) -->
+    <ImageButton
+        android:id="@+id/btnMapAdd"
+        android:layout_width="54dp"
+        android:layout_height="54dp"
+        android:layout_gravity="bottom|end"
+        android:layout_marginEnd="12dp"
+        android:layout_marginBottom="56dp"
+        android:background="@drawable/bg_map_fab_orange"
+        android:contentDescription="Sinalizar no mapa"
+        android:elevation="6dp"
+        android:padding="15dp"
+        android:scaleType="fitCenter"
+        android:src="@drawable/ic_map_plus" />
+
+    <!-- Card do pino selecionado -->
+    <include
+        layout="@layout/view_signal_card"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:layout_marginHorizontal="10dp"
+        android:layout_marginBottom="10dp" />
+
+    <!-- Prévia de rota offline + multi-paradas + simulação -->
+    <include
+        layout="@layout/view_route_preview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:layout_marginHorizontal="10dp"
+        android:layout_marginBottom="10dp" />
+
+    <!-- Overlay Turn-by-Turn 3D -->
+    <include
+        layout="@layout/view_nav_overlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <!-- Aviso de pacote offline ausente (reutiliza container de onboarding) -->
+    <ScrollView
+        android:id="@+id/mapSetupScroll"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginHorizontal="18dp"
+        android:overScrollMode="never"
+        android:visibility="gone">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_map_setup_card"
+            android:elevation="8dp"
+            android:orientation="vertical"
+            android:padding="18dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/plus_jakarta_sans"
+                android:text="Baixe o mapa offline de Joinville"
+                android:textColor="@color/drifly_ink"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:lineSpacingExtra="3dp"
+                android:text="O novo mapa do DriFly funciona 100% sem internet: mapa vetorial, busca de ruas e navegação por voz com evasão automática da Lista Negra."
+                android:textColor="@color/drifly_mut"
+                android:textSize="12.5sp" />
+
+            <TextView
+                android:id="@+id/btnMapSetupDownload"
+                android:layout_width="match_parent"
+                android:layout_height="46dp"
+                android:layout_marginTop="14dp"
+                android:background="@drawable/bg_btn_primary_gradient"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center"
+                android:maxLines="1"
+                android:singleLine="true"
+                android:text="Baixar Joinville (~35 MB)"
+                android:textColor="#FFFFFF"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/btnMapSetupClose"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/bg_light_btn_secondary"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center"
+                android:maxLines="1"
+                android:singleLine="true"
+                android:text="Agora não"
+                android:textColor="@color/drifly_ink"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+    </ScrollView>
+
+    <!-- Aviso do mapa colaborativo (oculto enquanto o recurso não existe) -->
+    <FrameLayout
+        android:id="@+id/mapLock"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/bg_light_screen"
+        android:clickable="true"
+        android:elevation="24dp"
+        android:focusable="true"
+        android:visibility="gone">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
+            android:paddingStart="32dp"
+            android:paddingEnd="32dp">
+
+            <ImageView
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                android:contentDescription="Mapa bloqueado"
+                android:src="@drawable/ic_map_lock" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:fontFamily="@font/plus_jakarta_sans"
+                android:gravity="center"
+                android:text="Mapa colaborativo em breve"
+                android:textColor="@color/drifly_ink"
+                android:textSize="19sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:gravity="center"
+                android:lineSpacingExtra="3dp"
+                android:text="Mapa offline, navegação inteligente com evasão da Lista Negra e avisos em tempo real de outros motoristas."
+                android:textColor="@color/drifly_mut"
+                android:textSize="13.5sp" />
+
+            <TextView
+                android:id="@+id/btnMapLockAssinar"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:layout_marginTop="22dp"
+                android:background="@drawable/bg_btn_primary_gradient"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center"
+                android:maxLines="1"
+                android:singleLine="true"
+                android:text="Liberar o mapa"
+                android:textColor="#FFFFFF"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+    </FrameLayout>
+
+    <!-- Gerenciador do pacote offline -->
+    <include
+        layout="@layout/view_offline_pack_sheet"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <!-- Painel "Sinalizar no mapa" (scrim + sheet) por cima de tudo -->
+    <include
+        layout="@layout/view_signal_editor"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+</FrameLayout>

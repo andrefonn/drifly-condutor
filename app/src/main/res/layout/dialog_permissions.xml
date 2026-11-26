@@ -1,0 +1,889 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="20dp"
+    android:background="@drawable/bg_light_dialog">
+
+    <!-- Topo do Diálogo -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <FrameLayout
+            android:layout_width="38dp"
+            android:layout_height="38dp"
+            android:background="@drawable/bg_light_circle"
+            android:padding="8dp">
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:src="@drawable/ic_settings_gear"
+                app:tint="@color/drifly_orange"
+                android:contentDescription="Configurações" />
+        </FrameLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="12dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Configurações do DriFly"
+                android:textColor="@color/drifly_ink"
+                android:fontFamily="@font/plus_jakarta_sans"
+                android:textStyle="bold"
+                android:textSize="18sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Permissões, backup e atualizações"
+                android:textColor="@color/drifly_mut"
+                android:fontFamily="@font/plus_jakarta_sans"
+                android:textSize="12sp" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginVertical="14dp"
+        android:background="@color/drifly_line" />
+
+    <!-- Bolinha flutuante do tanque -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:background="@drawable/bg_light_card"
+        android:padding="14dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Bolinha flutuante"
+                android:textColor="@color/drifly_ink"
+                android:fontFamily="@font/plus_jakarta_sans"
+                android:textStyle="bold"
+                android:textSize="14sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:text="Arraste para o X para esconder; ela volta ao iniciar o monitoramento."
+                android:textColor="@color/drifly_mut"
+                android:fontFamily="@font/plus_jakarta_sans"
+                android:textSize="12sp" />
+        </LinearLayout>
+
+        <Switch
+            android:id="@+id/swDiagFloatingBubble"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="true" />
+    </LinearLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:maxHeight="520dp"
+        android:overScrollMode="never">
+
+        <LinearLayout
+            android:id="@+id/layoutAccordionContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- ============================================== -->
+            <!-- SEÇÃO 1: PERMISSÕES DO SISTEMA (ACCORDION)    -->
+            <!-- ============================================== -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_light_card"
+                android:orientation="vertical">
+
+                <!-- Header Clicável -->
+                <LinearLayout
+                    android:id="@+id/headerPermsAccordion"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="14dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_banner_info"
+                        app:tint="@color/drifly_orange"
+                        android:contentDescription="Permissões" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="10dp"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Permissões do Sistema"
+                            android:textColor="@color/drifly_ink"
+                            android:fontFamily="@font/plus_jakarta_sans"
+                            android:textStyle="bold"
+                            android:textSize="14sp" />
+
+                        <TextView
+                            android:id="@+id/tvPermsHeaderStatus"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Toque para expandir os 4 itens"
+                            android:textColor="@color/drifly_mut"
+                            android:fontFamily="@font/plus_jakarta_sans"
+                            android:textSize="11sp" />
+                    </LinearLayout>
+
+                    <ImageView
+                        android:id="@+id/ivPermsChevron"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_chevron_down"
+                        app:tint="@color/drifly_mut"
+                        android:contentDescription="Expandir" />
+                </LinearLayout>
+
+                <!-- Conteúdo Retrátil (Minimizado por Padrão) -->
+                <LinearLayout
+                    android:id="@+id/contentPermsAccordion"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    android:paddingHorizontal="14dp"
+                    android:paddingBottom="14dp"
+                    android:orientation="vertical">
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginBottom="12dp"
+                        android:background="@color/drifly_line" />
+
+                    <!-- 1. Sobrepor -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <TextView
+                            android:id="@+id/tvDiagOverlayStatus"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="1. Sobrepor a outros apps"
+                            android:textColor="@color/drifly_ink"
+                            android:fontFamily="@font/plus_jakarta_sans"
+                            android:textSize="13sp" />
+
+                        <Button
+                            android:id="@+id/btnDiagPermOverlay"
+                            android:layout_width="wrap_content"
+                            android:layout_height="36dp"
+                            app:backgroundTint="@null"
+                            android:background="@drawable/bg_light_btn_primary"
+                            android:textColor="#FFFFFF"
+                            android:fontFamily="@font/plus_jakarta_sans"
+                            android:textStyle="bold"
+                            android:textSize="11sp"
+                            android:text="Ativar" />
+                    </LinearLayout>
+
+                    <!-- 2. Acessibilidade -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <TextView
+                            android:id="@+id/tvDiagA11yStatus"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="2. Serviço de Acessibilidade"
+                            android:textColor="@color/drifly_ink"
+                            android:fontFamily="@font/plus_jakarta_sans"
+                            android:textSize="13sp" />
+
+                        <Button
+                            android:id="@+id/btnDiagPermA11y"
+                            android:layout_width="wrap_content"
+                            android:layout_height="36dp"
+                            app:backgroundTint="@null"
+                            android:background="@drawable/bg_light_btn_primary"
+                            android:textColor="#FFFFFF"
+                            android:fontFamily="@font/plus_jakarta_sans"
+                            android:textStyle="bold"
+                            android:textSize="11sp"
+                            android:text="Ativar" />
+                    </LinearLayout>
+
+                    <!-- 3. Bateria -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <TextView
+                            android:id="@+id/tvDiagBatteryStatus"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="3. Bateria sem restrição"
+                            android:textColor="@color/drifly_ink"
+                            android:fontFamily="@font/plus_jakarta_sans"
+                            android:textSize="13sp" />
+
+                        <Button
+                            android:id="@+id/btnDiagPermBattery"
+                            android:layout_width="wrap_content"
+                            android:layout_height="36dp"
+                            app:backgroundTint="@null"
+                            android:background="@drawable/bg_light_btn_primary"
+                            android:textColor="#FFFFFF"
+                            android:fontFamily="@font/plus_jakarta_sans"
+                            android:textStyle="bold"
+                            android:textSize="11sp"
+                            android:text="Ajustar" />
+                    </LinearLayout>
+
+                    <!-- 4. Leitor de Notificações (Cancelamentos) -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <TextView
+                            android:id="@+id/tvDiagNotifStatus"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="4. Leitor de Notificações"
+                            android:textColor="@color/drifly_ink"
+                            android:fontFamily="@font/plus_jakarta_sans"
+                            android:textSize="13sp" />
+
+                        <Button
+                            android:id="@+id/btnDiagPermNotif"
+                            android:layout_width="wrap_content"
+                            android:layout_height="36dp"
+                            app:backgroundTint="@null"
+                            android:background="@drawable/bg_light_btn_primary"
+                            android:textColor="#FFFFFF"
+                            android:fontFamily="@font/plus_jakarta_sans"
+                            android:textStyle="bold"
+                            android:textSize="11sp"
+                            android:text="Ativar" />
+                    </LinearLayout>
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- ============================================== -->
+            <!-- SEÇÃO 2: BACKUP & RESTAURAÇÃO (ACCORDION)     -->
+            <!-- ============================================== -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:background="@drawable/bg_light_card"
+                android:orientation="vertical">
+
+                <!-- Header Clicável -->
+                <LinearLayout
+                    android:id="@+id/headerBackupAccordion"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="14dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_backup"
+                        app:tint="@color/drifly_green"
+                        android:contentDescription="Backup" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="10dp"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Backup &amp; Restauração"
+                            android:textColor="@color/drifly_ink"
+                            android:fontFamily="@font/plus_jakarta_sans"
+                            android:textStyle="bold"
+                            android:textSize="14sp" />
+
+                        <TextView
+                            android:id="@+id/tvBackupHeaderStatus"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Automático às 00:00 • Toque para ver"
+                            android:textColor="@color/drifly_mut"
+                            android:fontFamily="@font/plus_jakarta_sans"
+                            android:textSize="11sp" />
+                    </LinearLayout>
+
+                    <ImageView
+                        android:id="@+id/ivBackupChevron"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_chevron_down"
+                        app:tint="@color/drifly_mut"
+                        android:contentDescription="Expandir" />
+                </LinearLayout>
+
+                <!-- Conteúdo Retrátil (Minimizado por Padrão) -->
+                <LinearLayout
+                    android:id="@+id/contentBackupAccordion"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    android:paddingHorizontal="14dp"
+                    android:paddingBottom="14dp"
+                    android:orientation="vertical">
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginBottom="12dp"
+                        android:background="@color/drifly_line" />
+
+                    <!-- Informação do Backup Automático -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@color/drifly_line"
+                        android:padding="10dp"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="⏰ Backup Automático Diário: 00:00h"
+                            android:textColor="@color/drifly_green"
+                            android:fontFamily="@font/plus_jakarta_sans"
+                            android:textStyle="bold"
+                            android:textSize="12sp" />
+
+                        <TextView
+                            android:id="@+id/tvLastBackupInfo"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:text="Nenhum backup realizado hoje ainda"
+                            android:textColor="@color/drifly_mut"
+                            android:fontFamily="@font/plus_jakarta_sans"
+                            android:textSize="11sp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="3dp"
+                            android:text="📁 Pasta: Downloads/DriFly_Backups"
+                            android:textColor="@color/drifly_mut"
+                            android:fontFamily="@font/plus_jakarta_sans"
+                            android:textSize="10sp" />
+                    </LinearLayout>
+
+                    <!-- Botões de Ação de Backup -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:orientation="horizontal">
+
+                        <Button
+                            android:id="@+id/btnExportBackup"
+                            android:layout_width="0dp"
+                            android:layout_height="42dp"
+                            android:layout_weight="1"
+                            app:backgroundTint="@null"
+                            android:background="@drawable/bg_light_btn_primary"
+                            android:textColor="#FFFFFF"
+                            android:fontFamily="@font/plus_jakarta_sans"
+                            android:textStyle="bold"
+                            android:textSize="12sp"
+                            android:text="Exportar Agora" />
+
+                        <Button
+                            android:id="@+id/btnImportBackup"
+                            android:layout_width="0dp"
+                            android:layout_height="42dp"
+                            android:layout_weight="1"
+                            android:layout_marginStart="8dp"
+                            app:backgroundTint="@null"
+                            android:background="@drawable/bg_light_chip"
+                            android:textColor="@color/drifly_ink"
+                            android:fontFamily="@font/plus_jakarta_sans"
+                            android:textStyle="bold"
+                            android:textSize="12sp"
+                            android:text="Restaurar" />
+                    </LinearLayout>
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- ============================================== -->
+            <!-- SEÇÃO 3: ATUALIZAÇÕES DO APP (ACCORDION)      -->
+            <!-- ============================================== -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:background="@drawable/bg_light_card"
+                android:orientation="vertical">
+
+                <!-- Header Clicável -->
+                <LinearLayout
+                    android:id="@+id/headerUpdateAccordion"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="14dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_refresh_white"
+                        app:tint="@color/drifly_blue"
+                        android:contentDescription="Atualizações" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="10dp"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Atualizações do App"
+                            android:textColor="@color/drifly_ink"
+                            android:fontFamily="@font/plus_jakarta_sans"
+                            android:textStyle="bold"
+                            android:textSize="14sp" />
+
+                        <TextView
+                            android:id="@+id/tvUpdateHeaderStatus"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Versão 1.0.0 instalada"
+                            android:textColor="@color/drifly_mut"
+                            android:fontFamily="@font/plus_jakarta_sans"
+                            android:textSize="11sp" />
+                    </LinearLayout>
+
+                    <ImageView
+                        android:id="@+id/ivUpdateChevron"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_chevron_down"
+                        app:tint="@color/drifly_mut"
+                        android:contentDescription="Expandir" />
+                </LinearLayout>
+
+                <!-- Conteúdo Retrátil (Minimizado por Padrão) -->
+                <LinearLayout
+                    android:id="@+id/contentUpdateAccordion"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    android:paddingHorizontal="14dp"
+                    android:paddingBottom="14dp"
+                    android:orientation="vertical">
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginBottom="12dp"
+                        android:background="@color/drifly_line" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="O DriFly baixa e instala novas versões automaticamente direto do GitHub sem você precisar baixar APK manualmente."
+                        android:textColor="@color/drifly_mut"
+                        android:fontFamily="@font/plus_jakarta_sans"
+                        android:textSize="12sp" />
+
+                    <Button
+                        android:id="@+id/btnCheckAppUpdates"
+                        android:layout_width="match_parent"
+                        android:layout_height="42dp"
+                        android:layout_marginTop="12dp"
+                        app:backgroundTint="@null"
+                        android:background="@drawable/bg_light_btn_primary"
+                        android:textColor="#FFFFFF"
+                        android:fontFamily="@font/plus_jakarta_sans"
+                        android:textStyle="bold"
+                        android:textSize="12sp"
+                        android:text="Verificar se há Nova Versão" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- ============================================== -->
+            <!-- SEÇÃO 4: COMPATIBILIDADE DO APARELHO (ACCORDION)-->
+            <!-- ============================================== -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:background="@drawable/bg_light_card"
+                android:orientation="vertical">
+
+                <!-- Header Clicável -->
+                <LinearLayout
+                    android:id="@+id/headerOemAccordion"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="14dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_nav_rides"
+                        app:tint="@color/drifly_amber"
+                        android:contentDescription="Compatibilidade" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="10dp"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Compatibilidade do Aparelho"
+                            android:textColor="@color/drifly_ink"
+                            android:fontFamily="@font/plus_jakarta_sans"
+                            android:textStyle="bold"
+                            android:textSize="14sp" />
+
+                        <TextView
+                            android:id="@+id/tvOemHeaderStatus"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Detectando modelo..."
+                            android:textColor="@color/drifly_mut"
+                            android:fontFamily="@font/plus_jakarta_sans"
+                            android:textSize="11sp" />
+                    </LinearLayout>
+
+                    <ImageView
+                        android:id="@+id/ivOemChevron"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_chevron_down"
+                        app:tint="@color/drifly_mut"
+                        android:contentDescription="Expandir" />
+                </LinearLayout>
+
+                <!-- Conteúdo Retrátil -->
+                <LinearLayout
+                    android:id="@+id/contentOemAccordion"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    android:paddingHorizontal="14dp"
+                    android:paddingBottom="14dp"
+                    android:orientation="vertical">
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginBottom="12dp"
+                        android:background="@color/drifly_line" />
+
+                    <!-- Informações do Aparelho Detectado -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@color/drifly_line"
+                        android:padding="10dp"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/tvOemModelDetected"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="📱 Modelo: Motorola Moto G30"
+                            android:textColor="@color/drifly_green"
+                            android:fontFamily="@font/plus_jakarta_sans"
+                            android:textStyle="bold"
+                            android:textSize="12sp" />
+
+                        <TextView
+                            android:id="@+id/tvOemAndroidVersion"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:text="⚙️ Android 12 (API 31)"
+                            android:textColor="@color/drifly_mut"
+                            android:fontFamily="@font/plus_jakarta_sans"
+                            android:textSize="11sp" />
+
+                        <TextView
+                            android:id="@+id/tvOemOptimizationTip"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="6dp"
+                            android:text="Sistema 100% Otimizado."
+                            android:textColor="@color/drifly_ink"
+                            android:fontFamily="@font/plus_jakarta_sans"
+                            android:textSize="11sp" />
+                    </LinearLayout>
+
+                    <!-- Botões de Ação para Xiaomi / HyperOS -->
+                    <LinearLayout
+                        android:id="@+id/layoutXiaomiActions"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:orientation="vertical"
+                        android:visibility="gone">
+
+                        <Button
+                            android:id="@+id/btnOemAutostart"
+                            android:layout_width="match_parent"
+                            android:layout_height="40dp"
+                            app:backgroundTint="@null"
+                            android:background="@drawable/bg_light_btn_primary"
+                            android:textColor="#FFFFFF"
+                            android:fontFamily="@font/plus_jakarta_sans"
+                            android:textStyle="bold"
+                            android:textSize="11sp"
+                            android:text="Liberar Início Automático (MIUI / HyperOS)" />
+
+                        <Button
+                            android:id="@+id/btnOemPopup"
+                            android:layout_width="match_parent"
+                            android:layout_height="40dp"
+                            android:layout_marginTop="6dp"
+                            app:backgroundTint="@null"
+                            android:background="@drawable/bg_light_btn_secondary"
+                            android:textColor="@color/drifly_amber"
+                            android:fontFamily="@font/plus_jakarta_sans"
+                            android:textStyle="bold"
+                            android:textSize="11sp"
+                            android:text="Liberar Pop-up em 2º Plano (MIUI)" />
+                    </LinearLayout>
+
+                    <!-- Botão Bateria Sem Restrições / Device Care -->
+                    <Button
+                        android:id="@+id/btnOemBatteryOpt"
+                        android:layout_width="match_parent"
+                        android:layout_height="40dp"
+                        android:layout_marginTop="8dp"
+                        app:backgroundTint="@null"
+                        android:background="@drawable/bg_light_btn_secondary"
+                        android:textColor="@color/drifly_green"
+                        android:fontFamily="@font/plus_jakarta_sans"
+                        android:textStyle="bold"
+                        android:textSize="11sp"
+                        android:text="Ajustar Bateria Sem Restrições" />
+
+                    <!-- Botão Android 13+ Configurações Restritas -->
+                    <Button
+                        android:id="@+id/btnOemRestrictedSettings"
+                        android:layout_width="match_parent"
+                        android:layout_height="40dp"
+                        android:layout_marginTop="6dp"
+                        app:backgroundTint="@null"
+                        android:background="@drawable/bg_light_chip"
+                        android:textColor="@color/drifly_blue"
+                        android:fontFamily="@font/plus_jakarta_sans"
+                        android:textSize="11sp"
+                        android:text="Liberar Configurações Restritas (Android 13+)" />
+
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- ============================================== -->
+            <!-- SEÇÃO 5: DIAGNÓSTICO & LOGS NA NUVEM           -->
+            <!-- ============================================== -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:background="@drawable/bg_light_card"
+                android:orientation="vertical">
+
+                <!-- Header Clicável -->
+                <LinearLayout
+                    android:id="@+id/headerLogsAccordion"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="14dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_backup"
+                        app:tint="@color/drifly_green"
+                        android:contentDescription="Logs locais" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="10dp"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Diagnóstico &amp; Logs"
+                            android:textColor="@color/drifly_ink"
+                            android:fontFamily="@font/plus_jakarta_sans"
+                            android:textStyle="bold"
+                            android:textSize="14sp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Arquivo de log no próprio aparelho"
+                            android:textColor="@color/drifly_mut"
+                            android:fontFamily="@font/plus_jakarta_sans"
+                            android:textSize="11sp" />
+                    </LinearLayout>
+
+                    <ImageView
+                        android:id="@+id/ivLogsChevron"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_chevron_down"
+                        app:tint="@color/drifly_mut"
+                        android:contentDescription="Expandir" />
+                </LinearLayout>
+
+                <!-- Conteúdo Retrátil -->
+                <LinearLayout
+                    android:id="@+id/contentLogsAccordion"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    android:paddingHorizontal="14dp"
+                    android:paddingBottom="14dp"
+                    android:orientation="vertical">
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginBottom="12dp"
+                        android:background="@color/drifly_line" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="O log fica só neste celular. Compartilhe o arquivo se precisar de análise."
+                        android:textColor="@color/drifly_mut"
+                        android:fontFamily="@font/plus_jakarta_sans"
+                        android:textSize="11sp" />
+
+                    <Button
+                        android:id="@+id/btnShareLogsDrive"
+                        android:layout_width="match_parent"
+                        android:layout_height="42dp"
+                        android:layout_marginTop="12dp"
+                        app:backgroundTint="@null"
+                        android:background="@drawable/bg_light_btn_secondary"
+                        android:textColor="@color/drifly_blue"
+                        android:fontFamily="@font/plus_jakarta_sans"
+                        android:textStyle="bold"
+                        android:textSize="12sp"
+                        android:text="Compartilhar log" />
+
+                    <Button
+                        android:id="@+id/btnClearLogs"
+                        android:layout_width="match_parent"
+                        android:layout_height="38dp"
+                        android:layout_marginTop="8dp"
+                        app:backgroundTint="@null"
+                        android:background="@drawable/bg_light_chip"
+                        android:textColor="@color/drifly_red"
+                        android:fontFamily="@font/plus_jakarta_sans"
+                        android:textSize="11sp"
+                        android:text="Limpar log" />
+
+                </LinearLayout>
+            </LinearLayout>
+
+        </LinearLayout>
+    </ScrollView>
+
+    <Button
+        android:id="@+id/btnDiagClose"
+        android:layout_width="match_parent"
+        android:layout_height="46dp"
+        android:layout_marginTop="16dp"
+        app:backgroundTint="@null"
+        android:background="@drawable/bg_light_btn_primary"
+        android:elevation="3dp"
+        android:textColor="#FFFFFF"
+        android:fontFamily="@font/plus_jakarta_sans"
+        android:textStyle="bold"
+        android:textSize="14sp"
+        android:text="Concluído" />
+
+</LinearLayout>
